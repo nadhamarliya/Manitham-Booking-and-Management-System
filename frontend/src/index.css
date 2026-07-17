@@ -1,31 +1,4 @@
-@import url("https://googleapis.com");
+/* LEVEL 1: ALL IMPORTS MUST BE FIRST */
 @import "tailwindcss";
 
-* {
-  font-family: "Outfit", "Inter", sans-serif;
-}
 
-/* Card styles */
-.card {
-  @apply bg-white rounded-lg border border-slate-200/70;
-}
-
-.card-hover {
-  @apply hover:-translate-y-0.5 transition-all duration-300;
-}
-
-/* Button styles */
-.btn-primary {
-  @apply bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-5 py-2.5 rounded-md text-sm hover:from-indigo-700 hover:to-indigo-600 transition-all duration-200 shadow-md shadow-indigo-500/25 active:scale-[0.98];
-}
-
-.btn-secondary {
-  @apply bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-md text-sm hover:bg-slate-50 hover:border-slate-300 transition-all duration-200;
-}
-
-/* Input, select, Textarea styles */
-input,
-select,
-textarea {
-  @apply w-full px-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-md outline-none focus:border-indigo-500 transition-colors;
-}

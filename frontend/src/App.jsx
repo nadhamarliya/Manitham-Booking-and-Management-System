@@ -1,34 +1,44 @@
-import { Toaster } from "react-hot-toast";
-import { Route, Routes, Navigate } from "react-router-dom";
-
-// Fixed: Added missing imports (Adjust the file paths if your folders are structured differently)
-import Layout from "./pages/Layout";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import SponsorDetails from "./pages/SponsorDeatails";
-import PatientDetails from "./pages/PatientDetails";
-import LoginForm from "./components/LoginForm";
+import SponsorDetails from "./pages/SponsorDetails"; 
+import PatientDetails from "./pages/PatientDetails"; 
+import PrivateRoutes from "./utils/PrivateRoutes";
+import RoleBaseRoutes from "./utils/RoleBaseRoutes";
 
-
-const App = () => {
+const App = () => {                         
   return (
-    <>
-      <Toaster />
+    <BrowserRouter>
       <Routes>
-  <Route path="/" element={<Navigate to="/login" replace />} />
-  
-  <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/dashboard"/>} />
+        <Route path="/login" element={<Login/>} />
+        
+        <Route path="/dashboard" element={
+          <PrivateRoutes>
+            <RoleBaseRoutes requiredRole={['admin', 'user']}>
+              <Dashboard/>
+            </RoleBaseRoutes>
+          </PrivateRoutes>
+        }/>
 
-  <Route element={<Layout />}>
-    <Route path="/dashboard" element={<Dashboard />} />
-    <Route path="/sponsordetails" element={<SponsorDetails />} />
-    <Route path="/patientdetails" element={<PatientDetails />} />
-  </Route>
+        <Route path="/sponsor-details" element={
+          <PrivateRoutes>
+            <RoleBaseRoutes requiredRole={['admin', 'user']}>
+              <SponsorDetails />
+            </RoleBaseRoutes>
+          </PrivateRoutes>
+        }/>
 
-  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-</Routes>
-   
-    </> 
+        <Route path="/patient-details" element={
+          <PrivateRoutes>
+            <RoleBaseRoutes requiredRole={['admin', 'user']}>
+              <PatientDetails />
+            </RoleBaseRoutes>
+          </PrivateRoutes>
+        }/>
+
+      </Routes>
+    </BrowserRouter>
   );
 };
 
