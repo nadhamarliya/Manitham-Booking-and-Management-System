@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Plus, Pencil, Search, ArrowUpDown, Filter } from 'lucide-react';
 import AddSponsorDrawer from './AddSponsorDrawer';
 
@@ -6,12 +6,20 @@ const SponsorSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingSponsor, setEditingSponsor] = useState(null);
   
-  // This line must be exactly here at the top!
-  const [sponsors, setSponsors] = useState([]);
+  // SHARED LINK: Automatically loads any saved rows from the global cache
+  const [sponsors, setSponsors] = useState(() => {
+    const savedSponsors = localStorage.getItem('manitham_sponsors');
+    return savedSponsors ? JSON.parse(savedSponsors) : [];
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
   const [sortBy, setSortBy] = useState('date-newest');
+
+  // SHARED LINK: Automatically syncs data to the cache whenever you add/update/delete rows
+  useEffect(() => {
+    localStorage.setItem('manitham_sponsors', JSON.stringify(sponsors));
+  }, [sponsors]);
 
   const handleOpenAddDrawer = () => {
     setEditingSponsor(null);
@@ -54,7 +62,7 @@ const SponsorSummary = () => {
 
   const processedSponsors = sponsors
     .filter((sponsor) => {
-      const matchesSearch = sponsor.name.toLowerCase().includes(searchQuery.toLowerCase()) || sponsor.phone.includes(searchQuery);
+      const matchesSearch = sponsor.name?.toLowerCase().includes(searchQuery.toLowerCase()) || sponsor.phone?.includes(searchQuery);
       const matchesType = typeFilter === 'All' || sponsor.type === typeFilter;
       return matchesSearch && matchesType;
     })
@@ -156,7 +164,13 @@ const SponsorSummary = () => {
         </div>
       )}
 
-      <AddSponsorDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} onSave={handleSaveSponsor} onDelete={handleDeleteSponsor} editingSponsor={editingSponsor} />
+      <AddSponsorDrawer 
+        isOpen={isDrawerOpen} 
+        onClose={() => setIsDrawerOpen(false)} 
+        onSave={handleSaveSponsor} 
+        onDelete={handleDeleteSponsor} 
+        editingSponsor={editingSponsor} 
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import SponsorDetails from "./pages/SponsorDetails"; 
 import PatientDetails from "./pages/PatientDetails"; 
+import StaffDetails from "./pages/StaffDetails";
 import PrivateRoutes from "./utils/PrivateRoutes";
 import RoleBaseRoutes from "./utils/RoleBaseRoutes";
 
@@ -33,6 +34,14 @@ const App = () => {
           <PrivateRoutes>
             <RoleBaseRoutes requiredRole={['admin', 'user']}>
               <PatientDetails />
+            </RoleBaseRoutes>
+          </PrivateRoutes>
+        }/>
+
+        <Route path="/staff-details" element={
+          <PrivateRoutes>
+            <RoleBaseRoutes requiredRole={['admin']}>
+              <StaffDetails />
             </RoleBaseRoutes>
           </PrivateRoutes>
         }/>

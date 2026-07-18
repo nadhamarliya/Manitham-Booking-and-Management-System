@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
-import { Users, Plus, Pencil, Search, ArrowUpDown, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, Plus, Pencil, Search, ArrowUpDown, Filter, Eye } from 'lucide-react';
 import AddPatientDrawer from './AddPatientDrawer';
+import PatientDetailDrawer from './PatientDetailDrawer'; // Imported your new split details drawer
 
 const PatientSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
   
-  const [patients, setPatients] = useState([]);
+  // Controls state for our separate details drawer
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [viewingPatient, setViewingPatient] = useState(null); 
+  
+  // Initialize state from local cache memory
+  const [patients, setPatients] = useState(() => {
+    const savedPatients = localStorage.getItem('manitham_patients');
+    return savedPatients ? JSON.parse(savedPatients) : [];
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [categoryFilter, setCategoryFilter] = useState('All'); 
   const [sortBy, setSortBy] = useState('date-newest');
+
+  // Synchronize array metrics back to local storage automatically
+  useEffect(() => {
+    localStorage.setItem('manitham_patients', JSON.stringify(patients));
+  }, [patients]);
 
   const handleOpenAddDrawer = () => {
     setEditingPatient(null);
@@ -22,6 +37,12 @@ const PatientSummary = () => {
     setIsDrawerOpen(true);
   };
 
+  // Open the newly isolated detail drawer component
+  const handleOpenDetailDrawer = (patient) => {
+    setViewingPatient(patient);
+    setIsDetailOpen(true);
+  };
+
   const handleSavePatient = (patientData) => {
     if (editingPatient) {
       setPatients((prev) => 
@@ -29,7 +50,7 @@ const PatientSummary = () => {
       );
     } else {
       const newEntry = {
-        id: Date.now().toString(),
+        id: `pat-${Date.now()}`,
         ...patientData
       };
       setPatients((prev) => [...prev, newEntry]);
@@ -53,20 +74,22 @@ const PatientSummary = () => {
 
   const processedPatients = patients
     .filter((patient) => {
-      const matchesSearch = patient.name.toLowerCase().includes(searchQuery.toLowerCase()) || patient.phone.includes(searchQuery);
+      const matchesSearch = patient.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            patient.guardianMobile?.includes(searchQuery);
       const matchesStatus = statusFilter === 'All' || patient.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesCategory = categoryFilter === 'All' || patient.residentCategory === categoryFilter;
+      return matchesSearch && matchesStatus && matchesCategory;
     })
     .sort((a, b) => {
-      if (sortBy === 'date-newest') return new Date(b.date) - new Date(a.date);
-      if (sortBy === 'date-oldest') return new Date(a.date) - new Date(b.date);
-      if (sortBy === 'name-az') return a.name.localeCompare(b.name);
-      if (sortBy === 'name-za') return b.name.localeCompare(a.name);
+      if (sortBy === 'date-newest') return new Date(b.dateAdmission) - new Date(a.dateAdmission);
+      if (sortBy === 'date-oldest') return new Date(a.dateAdmission) - new Date(b.dateAdmission);
+      if (sortBy === 'name-az') return a.name?.localeCompare(b.name);
+      if (sortBy === 'name-za') return b.name?.localeCompare(a.name);
       return 0;
     });
-
-  return (
+      return (
     <div className="p-2 relative">
+      {/* Upper Action Header Layout */}
       <div className="flex items-center justify-between mb-6 border-b border-slate-200/60 pb-5">
         <div className="flex items-center gap-2.5 text-slate-900">
           <Users size={22} className="stroke-[2.5]" /> 
@@ -78,11 +101,12 @@ const PatientSummary = () => {
         </button>
       </div>
 
+      {/* Grid Multi-Filter Container Block Panel */}
       {patients.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
           <div className="relative flex items-center">
             <Search size={16} className="absolute left-3.5 text-slate-400" />
-            <input type="text" placeholder="Search by name or phone..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 transition-colors" />
+            <input type="text" placeholder="Search by name or mobile..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 transition-colors" />
           </div>
           <div className="relative flex items-center">
             <Filter size={16} className="absolute left-3.5 text-slate-400" />
@@ -95,10 +119,23 @@ const PatientSummary = () => {
             </select>
           </div>
           <div className="relative flex items-center">
+            <Filter size={16} className="absolute left-3.5 text-slate-400" />
+            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-700 appearance-none cursor-pointer">
+              <option value="All">All Categories</option>
+              <option value="Independent">Independent</option>
+              <option value="Bedridden">Bedridden</option>
+              <option value="Semi-Bedridden">Semi-Bedridden</option>
+              <option value="Wheelchair">Wheelchair</option>
+              <option value="Assisted Walking">Assisted Walking</option>
+              <option value="Dementia">Dementia</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+          <div className="relative flex items-center">
             <ArrowUpDown size={16} className="absolute left-3.5 text-slate-400" />
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-700 appearance-none cursor-pointer">
-              <option value="date-newest">Date: Newest First</option>
-              <option value="date-oldest">Date: Oldest First</option>
+              <option value="date-newest">Admission: Newest First</option>
+              <option value="date-oldest">Admission: Oldest First</option>
               <option value="name-az">Name: A to Z</option>
               <option value="name-za">Name: Z to A</option>
             </select>
@@ -106,6 +143,7 @@ const PatientSummary = () => {
         </div>
       )}
 
+      {/* Main Core Database Data Table Frame Element */}
       {patients.length === 0 ? (
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
           <div className="p-3 bg-slate-50 text-slate-400 rounded-full w-fit mb-3"><Users size={28} /></div>
@@ -122,10 +160,10 @@ const PatientSummary = () => {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
                   <th className="px-6 py-4 w-16 text-center">S.No</th>
-                  <th className="px-6 py-4">Date Joined</th>
+                  <th className="px-6 py-4">Admission Date</th>
                   <th className="px-6 py-4">Patient Name</th>
                   <th className="px-6 py-4">Age / Gender</th>
-                  <th className="px-6 py-4">Phone Number</th>
+                  <th className="px-6 py-4">Category</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4 text-center">Actions</th>
                 </tr>
@@ -134,17 +172,23 @@ const PatientSummary = () => {
                 {processedPatients.map((patient, index) => (
                   <tr key={patient.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 text-slate-400 text-center font-semibold">{index + 1}</td>
-                    <td className="px-6 py-3.5 text-slate-400 whitespace-nowrap">{patient.date}</td>
+                    <td className="px-6 py-3.5 text-slate-400 whitespace-nowrap">{patient.dateAdmission}</td>
                     <td className="px-6 py-3.5 font-bold text-slate-800">{patient.name}</td>
-                    <td className="px-6 py-3.5 text-slate-600">{patient.age} / {patient.gender}</td>
-                    <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">{patient.phone}</td>
+                    <td className="px-6 py-3.5 text-slate-600">{patient.age} Yrs / {patient.gender}</td>
+                    <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">
+                      {patient.residentCategory === 'Others' ? patient.otherCategory : patient.residentCategory}
+                    </td>
                     <td className="px-6 py-3.5">
                       <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${getStatusBadgeStyles(patient.status)}`}>
                         {patient.status}
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 whitespace-nowrap text-center">
-                      <button onClick={() => handleOpenUpdateDrawer(patient)} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg cursor-pointer">
+                    <td className="px-6 py-3.5 whitespace-nowrap text-center space-x-2">
+                      <button onClick={() => handleOpenDetailDrawer(patient)} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors">
+                        <Eye size={12} />
+                        <span>View More</span>
+                      </button>
+                      <button onClick={() => handleOpenUpdateDrawer(patient)} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg cursor-pointer transition-colors">
                         <Pencil size={12} />
                         <span>Update</span>
                       </button>
@@ -157,6 +201,15 @@ const PatientSummary = () => {
         </div>
       )}
 
+      {/* Mount Isolated Read-Only Detailed Sheet Drawer */}
+      <PatientDetailDrawer
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        patient={viewingPatient}
+        getStatusBadgeStyles={getStatusBadgeStyles}
+      />
+
+      {/* Mount Interactive Creation and Editing Form Drawer */}
       <AddPatientDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
@@ -169,3 +222,4 @@ const PatientSummary = () => {
 };
 
 export default PatientSummary;
+

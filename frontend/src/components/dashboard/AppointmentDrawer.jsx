@@ -4,29 +4,52 @@ import { X } from 'lucide-react';
 const AppointmentDrawer = ({ isOpen, onClose, slot, onSave }) => {
   if (!isOpen) return null;
 
-  // Set up local form state hooks initialized with current slot data values
   const [name, setName] = useState(slot.booking?.name || '');
   const [phone, setPhone] = useState(slot.booking?.phone || '');
   const [status, setStatus] = useState(slot.status === 'Empty' ? 'Pending' : slot.status);
 
-  // Synchronize state hook states if a user targets alternative meal slots
   useEffect(() => {
     setName(slot.booking?.name || '');
     setPhone(slot.booking?.phone || '');
     setStatus(slot.status === 'Empty' ? 'Pending' : slot.status);
   }, [slot]);
 
-  // Form submission handler to update data values to Booked or Pending
+  // Form submission handler
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // 1. Core internal handler to save slot UI state changes locally
     onSave(slot.id, { 
       name, 
       phone, 
       status: status === 'Booked' ? 'Booked' : 'Pending' 
     });
+
+    // 2. NEW LOGIC: Push allocation details to the Sponsor Summary dataset inside localStorage
+    if (name.trim() && phone.trim()) {
+      // Generate today's date formatted perfectly as YYYY-MM-DD
+      const todayDateStr = new Date().toISOString().split('T')[0];
+
+      // Pull current array from memory cache
+      const storedSponsors = localStorage.getItem('manitham_sponsors');
+      const activeSponsorsList = storedSponsors ? JSON.parse(storedSponsors) : [];
+
+      // Construct a clean, matching database entity schema item 
+      const newSponsorRow = {
+        id: `appt-${Date.now()}`, // Prevent key collision conflicts
+        date: todayDateStr,       // Current absolute date
+        name: name.trim(),
+        phone: phone.trim(),
+        type: 'Food'              // Auto-assigned category type
+      };
+
+      // Push and overwrite memory cache state
+      localStorage.setItem('manitham_sponsors', JSON.stringify([...activeSponsorsList, newSponsorRow]));
+    }
+
+    onClose();
   };
 
-  // 🎯 The new Clear Handler: Wipes input parameters and flags status as Empty
   const handleClearAllocation = () => {
     setName('');
     setPhone('');
@@ -36,13 +59,9 @@ const AppointmentDrawer = ({ isOpen, onClose, slot, onSave }) => {
 
   return (
     <>
-      {/* Dark layout canvas blur backdrop mask block element overlay layer */}
       <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50" onClick={onClose} />
 
-      {/* Side Slide-Over Drawer Container Framework Panel Layout */}
       <form onSubmit={handleSubmit} className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col border-l border-slate-100">
-        
-        {/* Drawer Header Layout block matched from screen snapshot */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-800">Slot {slot.slotNumber}</h2>
@@ -53,10 +72,7 @@ const AppointmentDrawer = ({ isOpen, onClose, slot, onSave }) => {
           </button>
         </div>
 
-        {/* Drawer Body Form Fields Layout Content View Module Area Container */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          
-          {/* Sponsor Name Field Label Input Box Element wrapper */}
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sponsor Name</label>
             <input 
@@ -69,7 +85,6 @@ const AppointmentDrawer = ({ isOpen, onClose, slot, onSave }) => {
             />
           </div>
 
-          {/* Phone Number Field Label Input Box Element wrapper */}
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Phone Number</label>
             <input 
@@ -82,7 +97,6 @@ const AppointmentDrawer = ({ isOpen, onClose, slot, onSave }) => {
             />
           </div>
 
-          {/* Confirmation Status Header block selector modules grid arrangement line */}
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Confirmation Status</label>
             <div className="grid grid-cols-2 gap-4">
@@ -110,13 +124,9 @@ const AppointmentDrawer = ({ isOpen, onClose, slot, onSave }) => {
               </button>
             </div>
           </div>
-
         </div>
 
-        {/* Drawer Footer Actions Panel with the newly added Clear allocation control button */}
         <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3 mt-auto">
-          
-          {/* Swapped "Cancel" out for this "Clear" action button element */}
           <button 
             type="button" 
             onClick={handleClearAllocation}
@@ -132,7 +142,6 @@ const AppointmentDrawer = ({ isOpen, onClose, slot, onSave }) => {
             Confirm
           </button>
         </div>
-
       </form>
     </>
   );

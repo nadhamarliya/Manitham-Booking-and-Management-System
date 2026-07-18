@@ -1,20 +1,25 @@
 import React from 'react';
 import { NavLink , useNavigate } from 'react-router-dom'; 
+import { useAuth } from '../../context/authContext.jsx'; // Correct up-two-folders relative lookup path
 import { 
   User, 
   LayoutDashboard, 
   UserCheck, 
   Users, 
+  ShieldAlert, 
   ChevronRight,
   LogOut 
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const userName = "John Doe";
+  const { user, logout } = useAuth(); // Destructured active context hooks
+  const userName = user?.name || "John Doe";
+  const userRole = user?.role || "user"; 
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    logout(); // Triggers session cleanup inside context state array keys
     console.log("Logging out user...");
     navigate('/login');
   };
@@ -38,7 +43,7 @@ const Sidebar = () => {
               <p className="text-[13px] font-semibold text-slate-200 leading-tight truncate w-36">
                 {userName}
               </p>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">User</p>
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5 capitalize">{userRole}</p>
             </div>
           </div>
         </div>
@@ -111,6 +116,30 @@ const Sidebar = () => {
               </>
             )}
           </NavLink>
+
+          {/* CRITICAL ROLE GUARD: Only mounts link tab if active credentials match 'admin' */}
+          {userRole === 'admin' && (
+            <NavLink 
+              to="/staff-details"
+              className={({ isActive }) => 
+                `flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  isActive 
+                    ? "bg-indigo-600/10 text-indigo-400 border-l-[3px] border-indigo-500 pl-[13px]" 
+                    : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <div className="flex items-center gap-3">
+                    <ShieldAlert size={18} />
+                    <span>Staff Details</span>
+                  </div>
+                  {isActive && <ChevronRight size={14} className="text-indigo-400" />}
+                </>
+              )}
+            </NavLink>
+          )}
 
         </div>
       </div>
