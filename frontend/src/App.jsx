@@ -4,7 +4,6 @@ import Dashboard from "./pages/Dashboard";
 import SponsorDetails from "./pages/SponsorDetails"; 
 import PatientDetails from "./pages/PatientDetails"; 
 import StaffDetails from "./pages/StaffDetails";
-import ResetPassword from "./pages/ResetPassword";
 import PrivateRoutes from "./utils/PrivateRoutes";
 import RoleBaseRoutes from "./utils/RoleBaseRoutes";
 
@@ -16,8 +15,6 @@ const App = () => {
         <Route path="/login" element={<Login/>} />
 
         <Route path="/login" element={<Login/>} />
-<Route path="/reset-password/:token" element={<ResetPassword />} />
-        
         <Route path="/dashboard" element={
           <PrivateRoutes>
             <RoleBaseRoutes requiredRole={['admin', 'user']}>

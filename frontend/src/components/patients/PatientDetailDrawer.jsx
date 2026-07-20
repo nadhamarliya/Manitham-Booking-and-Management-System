@@ -27,6 +27,7 @@ const PatientDetailDrawer = ({ isOpen, onClose, patient, getStatusBadgeStyles })
         <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
           
           {/* BLOCK 1: PRIMARY TIMELINE METRICS */}
+                    {/* BLOCK 1: PRIMARY TIMELINE METRICS */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-xs space-y-4">
             <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-widest border-b pb-1.5">1. Admission Information</h3>
             <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
@@ -35,9 +36,15 @@ const PatientDetailDrawer = ({ isOpen, onClose, patient, getStatusBadgeStyles })
               <div><p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Date of Birth</p><p className="mt-0.5 font-semibold text-slate-700">{patient.dob || 'N/A'}</p></div>
               <div><p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Age / Gender</p><p className="mt-0.5 font-semibold text-slate-700">{patient.age} Yrs / {patient.gender}</p></div>
               <div><p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Blood Group</p><p className="mt-0.5 font-semibold text-slate-700">{patient.bloodGroup || 'N/A'}</p></div>
-              <div><p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Current Status</p><p className="mt-1"><span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${getStatusBadgeStyles(patient.status)}`}>{patient.status}</span></p></div>
+              
+              {/* FIX: Displays Current Status exactly like your other text items */}
+              <div>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Current Status</p>
+                <p className="mt-0.5 font-semibold text-slate-700">{patient.status || 'N/A'}</p>
+              </div>
             </div>
           </div>
+
 
           {/* BLOCK 2: FAMILY EMERGENCY PROFILE METRICS */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-xs space-y-4">

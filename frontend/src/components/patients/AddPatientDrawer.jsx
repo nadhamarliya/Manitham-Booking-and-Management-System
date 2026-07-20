@@ -146,7 +146,6 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-800">{patient ? 'Update Clinical Registry' : 'Add New Admission'}</h2>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Manage information registry controls</p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 text-slate-400 rounded-xl hover:bg-slate-100 transition-colors"><X size={20} /></button>
         </div>
@@ -180,7 +179,7 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Calculated Age</label>
-                <input type="text" disabled placeholder="Auto-calculated" value={age} className="w-full px-4 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-bold" />
+                <input type="text" disabled placeholder="-" value={age} className="w-full px-4 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-bold" />
               </div>
             </div>
 
@@ -315,7 +314,7 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Calculated BMI</label>
-                <input type="text" disabled placeholder="Auto-score" value={bmi} className="w-full px-4 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-bold" />
+                <input type="text" disabled placeholder="-" value={bmi} className="w-full px-4 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-bold" />
               </div>
             </div>
           </div>

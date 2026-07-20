@@ -107,7 +107,7 @@ const SponsorSummary = () => {
       <div className="flex items-center justify-between mb-6 border-b border-slate-200/60 pb-5">
         <div className="flex items-center gap-2.5 text-slate-900">
           <Users size={22} className="stroke-[2.5]" /> 
-          <h2 className="text-xl font-black tracking-wider uppercase">Sponsor Database Management</h2>
+          <h2 className="text-xl font-black tracking-wider uppercase">Sponsor Details</h2>
         </div>
         <button onClick={handleOpenAddDrawer} className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all">
           <Plus size={16} className="stroke-[2.5]" />
@@ -143,7 +143,7 @@ const SponsorSummary = () => {
         </div>
       )}
 
-      {sponsors.length === 0 ? (
+            {sponsors.length === 0 ? (
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
           <div className="p-3 bg-slate-50 text-slate-400 rounded-full w-fit mb-3"><Users size={28} /></div>
           <h3 className="text-base font-bold text-slate-700">No Sponsors Registered Yet</h3>
@@ -162,7 +162,7 @@ const SponsorSummary = () => {
                   <th className="px-6 py-4">Date</th>
                   <th className="px-6 py-4">Sponsor Name</th>
                   <th className="px-6 py-4">Phone Number</th>
-                  <th className="px-6 py-4">Sponsor Type / Details</th>
+                  <th className="px-6 py-4">Sponsor Type </th>
                   <th className="px-6 py-4 text-center">Actions</th>
                 </tr>
               </thead>
@@ -174,13 +174,14 @@ const SponsorSummary = () => {
                     <td className="px-6 py-3.5 font-bold text-slate-800">{sponsor.name}</td>
                     <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">{sponsor.phone}</td>
                     <td className="px-6 py-3.5">
-                      <div className="flex flex-col gap-1 items-start">
-                        <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${getTypeBadgeStyles(sponsor.type)}`}>
+                      <div className="flex flex-col gap-0.5 items-start">
+                        {/* FIX: Removed the rounded colored badge wrapper styles */}
+                        <span className="font-semibold text-slate-700">
                           {sponsor.type}
                         </span>
                         {sponsor.type === 'Money' && sponsor.amount && (
-                          <span className="text-xs text-slate-500 font-semibold pl-1">
-                            ${sponsor.amount} ({sponsor.paymentType})
+                          <span className="text-xs text-slate-400 font-medium">
+                            ₹{sponsor.amount} ({sponsor.paymentType})
                           </span>
                         )}
                       </div>
@@ -211,4 +212,3 @@ const SponsorSummary = () => {
 };
 
 export default SponsorSummary;
-

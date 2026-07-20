@@ -80,9 +80,6 @@ const AddStaffDrawer = ({ isOpen, onClose, onSaveSuccess, staffMember }) => {
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-800">{staffMember ? 'Update Staff Credentials' : 'Add New Staff'}</h2>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
-              {staffMember ? 'Modify account parameters or manually override passwords' : 'Create private login profiles in MongoDB database'}
-            </p>
           </div>
           <button type="button" disabled={isSubmitting} onClick={onClose} className="p-1.5 text-slate-400 rounded-xl hover:bg-slate-100 transition-colors"><X size={20} /></button>
         </div>
@@ -102,14 +99,14 @@ const AddStaffDrawer = ({ isOpen, onClose, onSaveSuccess, staffMember }) => {
 
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-              {staffMember ? 'Force Reset Password (Leave blank to keep old password)' : 'Temporary Login Password'}
+              {staffMember ? 'Force Reset Password (Leave blank to keep old password)' : 'Password'}
             </label>
             <div className="relative flex items-center">
               <input 
                 type={showPassword ? "text" : "password"} 
                 required={!staffMember} 
                 disabled={isSubmitting} 
-                placeholder={staffMember ? "Type new secure password" : "Assign complex password"} 
+                placeholder={staffMember ? "Type new secure password" : "******"} 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 className="w-full px-4 py-2.5 pr-10 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" 
@@ -121,7 +118,7 @@ const AddStaffDrawer = ({ isOpen, onClose, onSaveSuccess, staffMember }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">System Clearance Role</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Role</label>
             <select value={role} disabled={isSubmitting} onChange={(e) => setRole(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-700">
               <option value="user">User (Standard Staff)</option>
               <option value="admin">Admin (Full System Privilege)</option>

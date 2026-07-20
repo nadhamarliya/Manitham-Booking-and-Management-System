@@ -119,7 +119,6 @@ const StaffSummary = () => {
                   <th className="px-6 py-4 w-16 text-center">S.No</th>
                   <th className="px-6 py-4">Full Name</th>
                   <th className="px-6 py-4">Email ID / Username</th>
-                  <th className="px-6 py-4">Security Password</th>
                   <th className="px-6 py-4">System Role</th>
                   {userRole === 'admin' && <th className="px-6 py-4 text-center">Actions</th>}
                 </tr>
@@ -130,11 +129,10 @@ const StaffSummary = () => {
                     <td className="px-6 py-3.5 text-slate-400 text-center font-semibold">{index + 1}</td>
                     <td className="px-6 py-3.5 font-bold text-slate-800">{member.name}</td>
                     <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">{member.email}</td>
-                    <td className="px-6 py-3.5 font-mono text-xs text-slate-400 select-none">•••••••• (Hashed Securely)</td>
                     <td className="px-6 py-3.5">
                       <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${
                         member.role === 'admin' 
-                          ? 'bg-rose-50 text-rose-600 border border-rose-100' 
+                          ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
                           : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
                       }`}>
                         {member.role === 'admin' ? 'Admin' : 'Staff'}

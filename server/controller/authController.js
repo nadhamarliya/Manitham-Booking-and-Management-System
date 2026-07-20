@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
+import nodemailer from "nodemailer";
 
 // 1. Secure Login with HTTP-Only Cookie
 const login = async (req, res) => {
@@ -42,89 +43,20 @@ const login = async (req, res) => {
     }
 };
 
-// 2. Token Generator & Outbound Personal Email Dispatcher
-const forgotPassword = async (req, res) => {
-    let user = null;
+// 2. Token-Free Validation verification hook check
+const verify = async (req, res) => {
     try {
-        const { email } = req.body;
-        user = await User.findOne({ email: email.toLowerCase().trim() });
-
-        if (!user) {
-            return res.status(200).json({ success: true, message: "A secure reset link has been dispatched to your inbox if the account exists." });
+        if (!req.user) {
+            return res.status(401).json({ success: false, error: "Unauthorized access profile credentials" });
         }
-
-        const rawResetToken = crypto.randomBytes(32).toString("hex");
-        user.resetPasswordToken = crypto.createHash("sha256").update(rawResetToken).digest("hex");
-        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; 
-        await user.save();
-
-        const resetUrl = `http://localhost:5173/reset-password/${rawResetToken}`;
-
-        const emailHtml = `
-            <div style="font-family: sans-serif; max-width: 500px; padding: 25px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-                <h2 style="color: #0d9488; margin-top: 0; font-size: 20px;">Manitham Portal Password Reset</h2>
-                <p style="color: #334155; font-size: 14px;">Hello ${user.name},</p>
-                <p style="color: #334155; font-size: 14px;">You requested a password reset for your staff login account. Click the button below to update your credentials:</p>
-                <div style="margin: 24px 0;">
-                    <a href="${resetUrl}" style="background-color: #0d9488; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 8px; display: inline-block; font-size: 14px;">Reset Password</a>
-                </div>
-                <p style="font-size: 12px; color: #64748b; background-color: #f8fafc; padding: 10px; border-radius: 6px;">
-                    This link is valid for 15 minutes. If you did not make this request, you can safely ignore this email.
-                </p>
-            </div>
-        `;
-
-        await sendEmail({
-            to: user.email,
-            subject: "Manitham Portal - Secure Password Reset Link",
-            html: emailHtml
-        });
-
-        return res.status(200).json({ success: true, message: "A secure reset link has been dispatched to your inbox if the account exists." });
-    } catch (error) {
-        console.error("Mailing Error context:", error.message);
-        if (user) {
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpires = undefined;
-            await user.save();
-        }
-        return res.status(500).json({ success: false, error: "Email dispatch failed. Verify server configurations." });
-    }
-};
-
-// 3. Process & Verify Password Overwrite from Email Link
-const resetPasswordFromLink = async (req, res) => {
-    try {
-        const { token } = req.params;
-        const { newPassword } = req.body;
-        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-        const user = await User.findOne({
-            resetPasswordToken: hashedToken,
-            resetPasswordExpires: { $gt: Date.now() }
-        });
-
-        if (!user) {
-            return res.status(400).json({ success: false, error: "Your reset token link is invalid or has expired." });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
-
-        return res.status(200).json({ success: true, message: "Password updated successfully! You can now log in." });
+        return res.status(200).json({ success: true, user: req.user });
     } catch (error) {
         return res.status(500).json({ success: false, error: error.message });
     }
 };
 
-const verify = async (req, res) => {
-    return res.status(200).json({ success: true, user: req.user });
-};
 
-// 4. Securely Register a New Staff Member into MongoDB Atlas
+// 5. Staff Registration Handler
 const registerStaff = async (req, res) => {
     try {
         const { name, username, email, password, role } = req.body;
@@ -157,7 +89,7 @@ const registerStaff = async (req, res) => {
     }
 };
 
-// 5. Fetch All Registered Staff Members from MongoDB (Excluding Passwords)
+// 6. Fetch All Registered Staff Members from MongoDB (Excluding Passwords)
 const getStaffList = async (req, res) => {
     try {
         const staffMembers = await User.find({}).select("-password");
@@ -167,7 +99,7 @@ const getStaffList = async (req, res) => {
     }
 };
 
-// 6. Securely Update Staff Profile Metrics & Password Credentials from Admin Portal
+// 7. Securely Update Staff Profile Metrics & Password Credentials from Admin Portal
 const updateStaff = async (req, res) => {
     try {
         const { id } = req.params;
@@ -201,7 +133,7 @@ const updateStaff = async (req, res) => {
     }
 };
 
-// 7. Delete a Staff Member from MongoDB Atlas
+// 8. Delete a Staff Member from MongoDB Atlas
 const deleteStaff = async (req, res) => {
     try {
         const { id } = req.params;
@@ -212,12 +144,10 @@ const deleteStaff = async (req, res) => {
     }
 };
 
-// Clean Named Export Mapping Bindings
+// 9. Unified Clean Named Export Block (Zero Duplications)
 export { 
     login, 
-    verify, 
-    forgotPassword, 
-    resetPasswordFromLink, 
+    verify,       
     registerStaff, 
     getStaffList, 
     updateStaff, 

@@ -56,7 +56,6 @@ const AddSponsorDrawer = ({ isOpen, onClose, onSave, onDelete, editingSponsor })
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-800">{editingSponsor ? 'Update Sponsor Profile' : 'Add New Sponsor'}</h2>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Manage information registry controls</p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 text-slate-400 rounded-xl"><X size={20} /></button>
         </div>
@@ -89,7 +88,7 @@ const AddSponsorDrawer = ({ isOpen, onClose, onSave, onDelete, editingSponsor })
           {type === 'Money' && (
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4 animate-fadeIn">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Amount ($)</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Amount (₹)</label>
                 <input type="number" required min="0" placeholder="Enter amount" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
               </div>
               <div>

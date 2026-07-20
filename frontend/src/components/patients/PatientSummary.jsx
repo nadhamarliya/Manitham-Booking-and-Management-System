@@ -113,12 +113,13 @@ const PatientSummary = () => {
       if (sortBy === 'name-za') return b.name?.localeCompare(a.name);
       return 0;
     });
-      return (
+        return (
     <div className="p-2 relative">
+      {/* Upper Action Header Layout */}
       <div className="flex items-center justify-between mb-6 border-b border-slate-200/60 pb-5">
         <div className="flex items-center gap-2.5 text-slate-900">
           <Users size={22} className="stroke-[2.5]" /> 
-          <h2 className="text-xl font-black tracking-wider uppercase">Patient Database Management</h2>
+          <h2 className="text-xl font-black tracking-wider uppercase">Patient Details</h2>
         </div>
         <button onClick={handleOpenAddDrawer} className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all">
           <Plus size={16} className="stroke-[2.5]" />
@@ -126,6 +127,7 @@ const PatientSummary = () => {
         </button>
       </div>
 
+      {/* Grid Multi-Filter Container Block Panel */}
       {patients.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
           <div className="relative flex items-center">
@@ -135,7 +137,7 @@ const PatientSummary = () => {
           <div className="relative flex items-center">
             <Filter size={16} className="absolute left-3.5 text-slate-400" />
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-700 appearance-none cursor-pointer">
-              <option value="All">All Statuses</option>
+              <option value="All">All Status</option>
               <option value="Active">Active</option>
               <option value="Inpatient">Inpatient</option>
               <option value="Outpatient">Outpatient</option>
@@ -167,6 +169,7 @@ const PatientSummary = () => {
         </div>
       )}
 
+      {/* Main Core Database Data Table Frame Element */}
       {patients.length === 0 ? (
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
           <div className="p-3 bg-slate-50 text-slate-400 rounded-full w-fit mb-3"><Users size={28} /></div>
@@ -187,7 +190,6 @@ const PatientSummary = () => {
                   <th className="px-6 py-4">Patient Name</th>
                   <th className="px-6 py-4">Age / Gender</th>
                   <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4 text-center">Actions</th>
                 </tr>
               </thead>
@@ -201,11 +203,7 @@ const PatientSummary = () => {
                     <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">
                       {patient.residentCategory === 'Others' ? patient.otherCategory : patient.residentCategory}
                     </td>
-                    <td className="px-6 py-3.5">
-                      <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${getStatusBadgeStyles(patient.status)}`}>
-                        {patient.status}
-                      </span>
-                    </td>
+                    {/* FIXED: Removed the empty broken <td> entirely to realign columns perfectly */}
                     <td className="px-6 py-3.5 whitespace-nowrap text-center space-x-2">
                       <button onClick={() => handleOpenDetailDrawer(patient)} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors">
                         <Eye size={12} />
@@ -228,7 +226,6 @@ const PatientSummary = () => {
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
         patient={viewingPatient}
-        getStatusBadgeStyles={getStatusBadgeStyles}
       />
 
       <AddPatientDrawer
