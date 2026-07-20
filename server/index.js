@@ -13,7 +13,7 @@ connectToDatabase();
 const app = express();
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://vercel.app"],
     credentials: true // Crucial: Allows frontend cross-origin requests to receive cookies
 }));
 app.use(express.json());
