@@ -1,54 +1,54 @@
-import React, { createContext, useContext, useState, useEffect} from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const userContext = createContext();
 
-const authContext = ({ children }) => {
-    const [user, setUser] = React.useState(null);
-    const [loading, setLoading] = React.useState(true); 
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
-        const verifyUser = async () => {
+        const verifyUserSession = async () => {
             try {
-                const token = localStorage.getItem('token');
-                if (token) {
-                const response = await axios.get('http://localhost:3000/api/auth/verify' , {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                // Production change: Fire a network request to verify the browser's HTTP-Only session cookie
+                const response = await axios.get('http://localhost:3000/api/auth/verify', {
+                    withCredentials: true // MANDATORY: Instructs the browser to pass along the session cookie securely
                 });
-                if(response.data.success) {
+
+                if (response.data.success) {
                     setUser(response.data.user);
-                }
-            } else {
-                setUser(null);
-                setLoading(false);
-            }
-            } catch (error) {
-                if (error.response && !error.response.data.error) {
+                } else {
                     setUser(null);
                 }
+            } catch (error) {
+                setUser(null);
             } finally {
                 setLoading(false);
             }
+        };
+        verifyUserSession();
+    }, []); 
+
+    const login = (userData) => {
+        setUser(userData);
+    };
+
+    const logout = async () => {
+        try {
+            // Optional: You can hit a backend signout route to clear the cookie, 
+            // or simply wipe the user state locally to kill the active session
+            setUser(null);
+        } catch (error) {
+            setUser(null);
         }
-        verifyUser();
-    }, []) 
-    const login = (user) => {
-        setUser(user);
-    }
+    };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('token');
-    }
-
-  return (
-   <userContext.Provider value={{ user, login, logout, loading }}>
-    {children}
-   </userContext.Provider>
-  )
-}
+    return (
+        <userContext.Provider value={{ user, login, logout, loading }}>
+            {!loading && children}
+        </userContext.Provider>
+    );
+};
 
 export const useAuth = () => useContext(userContext);
-export default authContext
+export default AuthProvider;

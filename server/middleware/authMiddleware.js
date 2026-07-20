@@ -3,7 +3,9 @@ import User from '../models/User.js';
 
 const verifyUser = async (req, res, next) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
+        // SECURE CHANGE: Look for the token inside the incoming cookies object dictionary instead of headers
+        const token = req.cookies?.token;
+        
         if (!token) {
             return res.status(404).json({ success: false, error: "Token not provided" });
         }
@@ -14,7 +16,6 @@ const verifyUser = async (req, res, next) => {
         }
 
         const user = await User.findById({ _id: decoded._id }).select("-password");
-
         if (!user) {
             return res.status(404).json({ success: false, error: "User not found" });
         }

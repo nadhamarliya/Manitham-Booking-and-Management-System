@@ -1,0 +1,16 @@
+# Ignore local environment variables configuration files
+.env
+.env.local
+.env.*.local
+
+# Ignore compiled node dependencies modules directories
+node_modules/
+dist/
+build/
+
+# Ignore local browser tracking logs and system files
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

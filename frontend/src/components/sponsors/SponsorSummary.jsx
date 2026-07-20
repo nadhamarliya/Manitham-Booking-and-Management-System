@@ -2,24 +2,41 @@ import React, { useState, useEffect } from 'react';
 import { Users, Plus, Pencil, Search, ArrowUpDown, Filter } from 'lucide-react';
 import AddSponsorDrawer from './AddSponsorDrawer';
 
+const API_BASE_URL = "http://localhost:3000/api/sponsor"; // Replace with your real backend port address
+
 const SponsorSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingSponsor, setEditingSponsor] = useState(null);
-  
-  // SHARED LINK: Automatically loads any saved rows from the global cache
-  const [sponsors, setSponsors] = useState(() => {
-    const savedSponsors = localStorage.getItem('manitham_sponsors');
-    return savedSponsors ? JSON.parse(savedSponsors) : [];
-  });
-
+  const [sponsors, setSponsors] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
   const [sortBy, setSortBy] = useState('date-newest');
 
-  // SHARED LINK: Automatically syncs data to the cache whenever you add/update/delete rows
+  // Helper function to extract auth token safely
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token'); // Adjust key matching your authentication setup
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
+  // Fetch data directly from DB on initialization
+  const fetchSponsors = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/list`, { headers: getAuthHeaders() });
+      const data = await response.json();
+      if (data.success) {
+        setSponsors(data.sponsors);
+      }
+    } catch (error) {
+      console.error("Error retrieving sponsor logs:", error);
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem('manitham_sponsors', JSON.stringify(sponsors));
-  }, [sponsors]);
+    fetchSponsors();
+  }, []);
 
   const handleOpenAddDrawer = () => {
     setEditingSponsor(null);
@@ -31,24 +48,42 @@ const SponsorSummary = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleSaveSponsor = (sponsorData) => {
-    if (editingSponsor) {
-      setSponsors((prev) => 
-        prev.map(item => item.id === editingSponsor.id ? { ...item, ...sponsorData } : item)
-      );
-    } else {
-      const newEntry = {
-        id: Date.now().toString(),
-        ...sponsorData
-      };
-      setSponsors((prev) => [...prev, newEntry]);
+  const handleSaveSponsor = async (sponsorData) => {
+    try {
+      if (editingSponsor) {
+        // Trigger PUT API route implementation
+        const response = await fetch(`${API_BASE_URL}/update/${editingSponsor._id}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(sponsorData)
+        });
+        if (response.ok) fetchSponsors();
+      } else {
+        // Trigger POST API route implementation
+        const response = await fetch(`${API_BASE_URL}/add`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(sponsorData)
+        });
+        if (response.ok) fetchSponsors();
+      }
+      setIsDrawerOpen(false);
+    } catch (error) {
+      console.error("Error writing data profile records:", error);
     }
-    setIsDrawerOpen(false);
   };
 
-  const handleDeleteSponsor = (id) => {
-    setSponsors((prev) => prev.filter(sponsor => sponsor.id !== id));
-    setIsDrawerOpen(false);
+  const handleDeleteSponsor = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/delete/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      if (response.ok) fetchSponsors();
+      setIsDrawerOpen(false);
+    } catch (error) {
+      console.error("Error clear record item execution:", error);
+    }
   };
 
   const getTypeBadgeStyles = (type) => {
@@ -73,8 +108,7 @@ const SponsorSummary = () => {
       if (sortBy === 'name-za') return b.name.localeCompare(a.name);
       return 0;
     });
-
-  return (
+      return (
     <div className="p-2 relative">
       <div className="flex items-center justify-between mb-6 border-b border-slate-200/60 pb-5">
         <div className="flex items-center gap-2.5 text-slate-900">
@@ -134,24 +168,31 @@ const SponsorSummary = () => {
                   <th className="px-6 py-4">Date</th>
                   <th className="px-6 py-4">Sponsor Name</th>
                   <th className="px-6 py-4">Phone Number</th>
-                  <th className="px-6 py-4">Sponsor Type</th>
+                  <th className="px-6 py-4">Sponsor Type / Details</th>
                   <th className="px-6 py-4 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
                 {processedSponsors.map((sponsor, index) => (
-                  <tr key={sponsor.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={sponsor._id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 text-slate-400 text-center font-semibold">{index + 1}</td>
                     <td className="px-6 py-3.5 text-slate-400 whitespace-nowrap">{sponsor.date}</td>
                     <td className="px-6 py-3.5 font-bold text-slate-800">{sponsor.name}</td>
                     <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">{sponsor.phone}</td>
                     <td className="px-6 py-3.5">
-                      <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${getTypeBadgeStyles(sponsor.type)}`}>
-                        {sponsor.type}
-                      </span>
+                      <div className="flex flex-col gap-1 items-start">
+                        <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${getTypeBadgeStyles(sponsor.type)}`}>
+                          {sponsor.type}
+                        </span>
+                        {sponsor.type === 'Money' && sponsor.amount && (
+                          <span className="text-xs text-slate-500 font-semibold pl-1">
+                            ${sponsor.amount} ({sponsor.paymentType})
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-3.5 whitespace-nowrap text-center">
-                      <button onClick={() => handleOpenUpdateDrawer(sponsor)} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg cursor-pointer">
+                      <button onClick={() => handleOpenUpdateDrawer(sponsor)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl cursor-pointer transition-colors">
                         <Pencil size={12} />
                         <span>Update</span>
                       </button>
@@ -164,15 +205,16 @@ const SponsorSummary = () => {
         </div>
       )}
 
-      <AddSponsorDrawer 
-        isOpen={isDrawerOpen} 
-        onClose={() => setIsDrawerOpen(false)} 
-        onSave={handleSaveSponsor} 
-        onDelete={handleDeleteSponsor} 
-        editingSponsor={editingSponsor} 
+      <AddSponsorDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onSave={handleSaveSponsor}
+        onDelete={handleDeleteSponsor}
+        editingSponsor={editingSponsor}
       />
     </div>
   );
 };
 
 export default SponsorSummary;
+

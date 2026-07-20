@@ -1,28 +1,13 @@
 import mongoose from "mongoose";
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'user'],
-    required: true
-  },
-  profilePicture: {type: String},
-  createdAt: {type: Date, default: Date.now},
-  updatedAt: {type: Date, default: Date.now}
-});
 
-const User = mongoose.model('User', userSchema);
-export default User;
+const userSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: ["admin", "user"], default: "user" },
+    // Production Security Additions: Handles temporary reset windows safely
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
+}, { timestamps: true });
+
+export default mongoose.models.User || mongoose.model("User", userSchema);
