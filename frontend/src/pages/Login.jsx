@@ -26,7 +26,7 @@ const Login = () => {
         e.preventDefault();
         setError(''); 
         try {
-            const response = await axios.post('https://manitham-portal.onrender.com', { 
+            const response = await axios.post('https://manitham-portal.onrender.com/api/auth/login', { 
                 email: email.trim(), 
                 password 
             }, { withCredentials: true });

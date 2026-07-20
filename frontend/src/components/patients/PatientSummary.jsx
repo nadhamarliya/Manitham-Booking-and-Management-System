@@ -3,7 +3,7 @@ import { Users, Plus, Pencil, Search, ArrowUpDown, Filter, Eye } from 'lucide-re
 import AddPatientDrawer from './AddPatientDrawer';
 import PatientDetailDrawer from './PatientDetailDrawer';
 
-const API_BASE_URL = "https://manitham-portal.onrender.com"; 
+const API_BASE_URL = "https://manitham-portal.onrender.com/api/patient"; 
 
 const PatientSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
