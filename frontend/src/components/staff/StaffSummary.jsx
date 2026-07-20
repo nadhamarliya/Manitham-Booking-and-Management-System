@@ -18,7 +18,7 @@ const StaffSummary = () => {
   // Fetch live staff list directly from MongoDB Atlas on page mount
   const fetchStaffData = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/auth/staff-list', { withCredentials: true });
+      const response = await axios.get('https://onrender.com', { withCredentials: true });
       if (response.data.success) {
         setStaffList(response.data.staff);
       }
@@ -47,7 +47,7 @@ const StaffSummary = () => {
     if (userRole !== 'admin') return;
     if (window.confirm("Are you sure you want to delete this staff member's portal access?")) {
       try {
-        const response = await axios.delete(`http://localhost:3000/api/auth/delete-staff/${id}`, { withCredentials: true });
+        const response = await axios.delete(`https://onrender.com{id}`, { withCredentials: true });
         if (response.data.success) {
           fetchStaffData();
         }
