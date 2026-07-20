@@ -38,7 +38,7 @@ const AddStaffDrawer = ({ isOpen, onClose, onSaveSuccess, staffMember }) => {
     try {
       if (staffMember) {
         // UPDATE MODE: Trigger PUT route pathway endpoint
-        const response = await axios.put(`https://onrender.com{staffMember._id}`, {
+        const response = await axios.put(`https://manitham-portal.onrender.com/${staffMember._id}`, {
           name: name.trim(),
           email: email.trim().toLowerCase(),
           password: password, // Only carries over values if a fresh string was explicitly typed
@@ -50,7 +50,7 @@ const AddStaffDrawer = ({ isOpen, onClose, onSaveSuccess, staffMember }) => {
         }
       } else {
         // CREATION MODE: Trigger POST route pathway endpoint
-        const response = await axios.post('https://onrender.com', {
+        const response = await axios.post('https://manitham-portal.onrender.com', {
           name: name.trim(),
           username: email.trim().toLowerCase(),
           password: password,

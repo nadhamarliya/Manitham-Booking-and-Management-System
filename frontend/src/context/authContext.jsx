@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
         const verifyUserSession = async () => {
             try {
                 // Production change: Fire a network request to verify the browser's HTTP-Only session cookie
-                const response = await axios.get('https://onrender.com', {
+                const response = await axios.get('https://manitham-portal.onrender.com', {
                     withCredentials: true // MANDATORY: Instructs the browser to pass along the session cookie securely
                 });
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Plus, Pencil, Search, ArrowUpDown, Filter } from 'lucide-react';
 import AddSponsorDrawer from './AddSponsorDrawer';
 
-const API_BASE_URL = "https://onrender.com"; 
+const API_BASE_URL = "https://manitham-portal.onrender.com"; 
 
 const SponsorSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

@@ -3,7 +3,7 @@ import { Calendar, Bell } from 'lucide-react';
 import BookingCard from './BookingCard';
 import AppointmentDrawer from './AppointmentDrawer';
 
-const API_BASE_URL = "https://onrender.com"; 
+const API_BASE_URL = "https://manitham-portal.onrender.com"; 
 
 const getSponsorReminders = (sponsorsList) => {
   const today = new Date();
