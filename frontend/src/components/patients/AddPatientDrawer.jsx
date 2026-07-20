@@ -325,7 +325,7 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
         <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3 mt-auto">
           <div>
             {patient ? (
-              <button type="button" onClick={() => onDelete(patient.id)} className="px-4 py-2.5 text-sm font-semibold text-rose-500 hover:bg-rose-50 rounded-xl cursor-pointer transition-colors">Delete Record</button>
+              <button type="button" onClick={() => onDelete(patient._id)} className="px-4 py-2.5 text-sm font-semibold text-rose-500 hover:bg-rose-50 rounded-xl cursor-pointer transition-colors">Delete Record</button>
             ) : (
               <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-600 rounded-xl cursor-pointer transition-colors">Close</button>
             )}

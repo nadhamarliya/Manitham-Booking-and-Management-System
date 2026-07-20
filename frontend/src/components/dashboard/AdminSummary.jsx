@@ -3,7 +3,8 @@ import { Calendar, Bell } from 'lucide-react';
 import BookingCard from './BookingCard';
 import AppointmentDrawer from './AppointmentDrawer';
 
-// Engine logic to check for anniversaries exactly 10 days away
+const API_BASE_URL = "http://localhost:3000/api/sponsor"; 
+
 const getSponsorReminders = (sponsorsList) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -22,33 +23,11 @@ const getSponsorReminders = (sponsorsList) => {
   });
 };
 
-// Default empty layout state template for a brand new day
-const DEFAULT_SLOTS = [
-  { id: '1', slotNumber: '1', slotName: 'Breakfast', status: 'Empty', booking: null },
-  { id: '2', slotNumber: '2', slotName: 'Lunch', status: 'Empty', booking: null },
-  { id: '3', slotNumber: '3', slotName: 'Dinner', status: 'Empty', booking: null },
-];
-
 const AdminSummary = () => {
   const todayDateString = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
-  
-  // Clean date key identifier to mark today uniquely (e.g., "2026-07-18")
   const todayKey = new Date().toISOString().split('T')[0];
 
-  // 1. Slots state initialized with automatic old-day checking mechanics
-  const [slots, setSlots] = useState(() => {
-    const savedSlotsData = localStorage.getItem('manitham_daily_slots');
-    const savedSlotsDate = localStorage.getItem('manitham_slots_date_key');
-
-    // If a saved timestamp exists and matches today's date, restore the values
-    if (savedSlotsData && savedSlotsDate === todayKey) {
-      return JSON.parse(savedSlotsData);
-    }
-    
-    // Otherwise, it's a brand new day! Wipe the old data and return clear slots
-    return DEFAULT_SLOTS;
-  });
-
+  const [slots, setSlots] = useState([]);
   const [sponsors, setSponsors] = useState([]);
   const [reminders, setReminders] = useState([]);
   
@@ -60,22 +39,46 @@ const AdminSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  // 2. Automatically sync active slot choices and today's date to storage on every state shift
-  useEffect(() => {
-    localStorage.setItem('manitham_daily_slots', JSON.stringify(slots));
-    localStorage.setItem('manitham_slots_date_key', todayKey);
-  }, [slots, todayKey]);
+  // Fetch today's slot configuration directly from DB
+  const fetchDailySlots = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/slots/${todayKey}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSlots(data.slots);
+      }
+    } catch (error) {
+      console.error("Error loading daily appointment configurations:", error);
+    }
+  };
+
+  // Fetch global sponsors list to calculate reminder alerts
+  const fetchSponsors = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/list`, { 
+        method: 'GET',
+        credentials: 'include' 
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSponsors(data.sponsors);
+      }
+    } catch (error) {
+      console.error("Error fetching live sponsors for alert logs:", error);
+    }
+  };
 
   useEffect(() => {
-    const savedSponsors = localStorage.getItem('manitham_sponsors');
-    if (savedSponsors) {
-      setSponsors(JSON.parse(savedSponsors));
-    }
-  }, []);
+    fetchDailySlots();
+    fetchSponsors();
+  }, [todayKey]);
 
   useEffect(() => {
     const alerts = getSponsorReminders(sponsors);
-    const activeAlerts = alerts.filter(alert => !dismissedSponsors.includes(alert.id));
+    const activeAlerts = alerts.filter(alert => !dismissedSponsors.includes(alert._id));
     setReminders(activeAlerts);
   }, [sponsors, dismissedSponsors]);
 
@@ -94,22 +97,32 @@ const AdminSummary = () => {
     setIsDrawerOpen(true);
   };
 
-  const handleSaveBooking = (slotId, updatedData) => {
-    setSlots(prevSlots => 
-      prevSlots.map(slot => 
-        slot.id === slotId 
-          ? { 
-              ...slot, 
-              status: updatedData.status, 
-              booking: updatedData.status === 'Empty' ? null : { name: updatedData.name, phone: updatedData.phone } 
-            } 
-          : slot
-      )
-    );
+  const handleSaveBooking = async (slotId, updatedData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/slots/book`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          dateKey: todayKey,
+          slotNumber: selectedSlot.slotNumber,
+          slotName: selectedSlot.slotName,
+          status: updatedData.status,
+          name: updatedData.name,
+          phone: updatedData.phone
+        })
+      });
+
+      if (response.ok) {
+        fetchDailySlots(); // Refresh slots directly from DB
+        fetchSponsors();   // Refresh reminders log metrics
+      }
+    } catch (error) {
+      console.error("Error saving slot selection:", error);
+    }
     setIsDrawerOpen(false);
   };
-
-  return (
+    return (
     <div className="p-2 relative space-y-8">
       
       {/* Header Layout */}
@@ -156,11 +169,11 @@ const AdminSummary = () => {
                     const renewalDayStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
                     
                     return (
-                      <tr key={sponsor.id} className="hover:bg-slate-50/60 transition-colors">
+                      <tr key={sponsor._id} className="hover:bg-slate-50/60 transition-colors">
                         <td className="px-6 py-4 text-center">
                           <input 
                             type="checkbox" 
-                            onChange={() => handleActionCheck(sponsor.id)}
+                            onChange={() => handleActionCheck(sponsor._id)}
                             className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer accent-slate-900"
                           />
                         </td>
@@ -195,3 +208,4 @@ const AdminSummary = () => {
 };
 
 export default AdminSummary;
+

@@ -1,9 +1,36 @@
 import Sponsor from "../models/Sponsor.js";
 
-// 1. Register a New Sponsor
+// 1. Register a New Sponsor (Handles both regular manual additions and calendar slot allocations)
 export const addSponsor = async (req, res) => {
     try {
-        const newSponsor = new Sponsor(req.body);
+        const { date, name, phone, type, amount, paymentType, slotId } = req.body;
+
+        // If the request comes from the Appointment Slots drawer, it contains a slotId
+        if (slotId && name && phone) {
+            const newAppointmentSponsor = new Sponsor({
+                date: date || new Date().toISOString().split('T')[0], // Use incoming date or default to today
+                name: name.trim(),
+                phone: phone.trim(),
+                type: 'Food' // Automatically set type to Food for appointment bookings
+            });
+
+            await newAppointmentSponsor.save();
+            return res.status(201).json({ 
+                success: true, 
+                message: "Slot allocation successfully saved as a Food sponsor in MongoDB!" 
+            });
+        }
+
+        // Standard path: Handles submissions directly from the AddSponsorDrawer component form
+        const newSponsor = new Sponsor({
+            date,
+            name,
+            phone,
+            type: type || 'Food',
+            amount,
+            paymentType
+        });
+
         await newSponsor.save();
         return res.status(201).json({ success: true, message: "Sponsor registered successfully inside MongoDB!" });
     } catch (error) {

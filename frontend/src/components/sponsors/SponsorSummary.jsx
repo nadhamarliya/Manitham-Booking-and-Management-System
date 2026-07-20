@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Plus, Pencil, Search, ArrowUpDown, Filter } from 'lucide-react';
 import AddSponsorDrawer from './AddSponsorDrawer';
 
-const API_BASE_URL = "http://localhost:3000/api/sponsor"; // Replace with your real backend port address
+const API_BASE_URL = "http://localhost:3000/api/sponsor"; 
 
 const SponsorSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -12,19 +12,13 @@ const SponsorSummary = () => {
   const [typeFilter, setTypeFilter] = useState('All');
   const [sortBy, setSortBy] = useState('date-newest');
 
-  // Helper function to extract auth token safely
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token'); // Adjust key matching your authentication setup
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-  };
-
-  // Fetch data directly from DB on initialization
+  // Fetch data directly from DB using credentials (cookies)
   const fetchSponsors = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/list`, { headers: getAuthHeaders() });
+      const response = await fetch(`${API_BASE_URL}/list`, { 
+        method: 'GET',
+        credentials: 'include' 
+      });
       const data = await response.json();
       if (data.success) {
         setSponsors(data.sponsors);
@@ -51,18 +45,18 @@ const SponsorSummary = () => {
   const handleSaveSponsor = async (sponsorData) => {
     try {
       if (editingSponsor) {
-        // Trigger PUT API route implementation
         const response = await fetch(`${API_BASE_URL}/update/${editingSponsor._id}`, {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(sponsorData)
         });
         if (response.ok) fetchSponsors();
       } else {
-        // Trigger POST API route implementation
         const response = await fetch(`${API_BASE_URL}/add`, {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(sponsorData)
         });
         if (response.ok) fetchSponsors();
@@ -77,7 +71,7 @@ const SponsorSummary = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/delete/${id}`, {
         method: 'DELETE',
-        headers: getAuthHeaders()
+        credentials: 'include'
       });
       if (response.ok) fetchSponsors();
       setIsDrawerOpen(false);

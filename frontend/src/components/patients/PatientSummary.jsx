@@ -1,31 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Plus, Pencil, Search, ArrowUpDown, Filter, Eye } from 'lucide-react';
 import AddPatientDrawer from './AddPatientDrawer';
-import PatientDetailDrawer from './PatientDetailDrawer'; // Imported your new split details drawer
+import PatientDetailDrawer from './PatientDetailDrawer';
+
+const API_BASE_URL = "http://localhost:3000/api/patient"; 
 
 const PatientSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
-  
-  // Controls state for our separate details drawer
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [viewingPatient, setViewingPatient] = useState(null); 
-  
-  // Initialize state from local cache memory
-  const [patients, setPatients] = useState(() => {
-    const savedPatients = localStorage.getItem('manitham_patients');
-    return savedPatients ? JSON.parse(savedPatients) : [];
-  });
+  const [patients, setPatients] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('All'); 
   const [sortBy, setSortBy] = useState('date-newest');
 
-  // Synchronize array metrics back to local storage automatically
+  const fetchPatients = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/list`, { 
+        method: 'GET',
+        credentials: 'include' 
+      });
+      const data = await response.json();
+      if (data.success) {
+        setPatients(data.patients);
+      }
+    } catch (error) {
+      console.error("Error retrieving medical records:", error);
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem('manitham_patients', JSON.stringify(patients));
-  }, [patients]);
+    fetchPatients();
+  }, []);
 
   const handleOpenAddDrawer = () => {
     setEditingPatient(null);
@@ -37,30 +46,47 @@ const PatientSummary = () => {
     setIsDrawerOpen(true);
   };
 
-  // Open the newly isolated detail drawer component
   const handleOpenDetailDrawer = (patient) => {
     setViewingPatient(patient);
     setIsDetailOpen(true);
   };
 
-  const handleSavePatient = (patientData) => {
-    if (editingPatient) {
-      setPatients((prev) => 
-        prev.map(item => item.id === editingPatient.id ? { ...item, ...patientData } : item)
-      );
-    } else {
-      const newEntry = {
-        id: `pat-${Date.now()}`,
-        ...patientData
-      };
-      setPatients((prev) => [...prev, newEntry]);
+  const handleSavePatient = async (patientData) => {
+    try {
+      if (editingPatient) {
+        const response = await fetch(`${API_BASE_URL}/update/${editingPatient._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(patientData)
+        });
+        if (response.ok) fetchPatients();
+      } else {
+        const response = await fetch(`${API_BASE_URL}/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(patientData)
+        });
+        if (response.ok) fetchPatients();
+      }
+      setIsDrawerOpen(false);
+    } catch (error) {
+      console.error("Error committing medical database record:", error);
     }
-    setIsDrawerOpen(false);
   };
 
-  const handleDeletePatient = (id) => {
-    setPatients((prev) => prev.filter(patient => patient.id !== id));
-    setIsDrawerOpen(false);
+  const handleDeletePatient = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/delete/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (response.ok) fetchPatients();
+      setIsDrawerOpen(false);
+    } catch (error) {
+      console.error("Error executing profile purge:", error);
+    }
   };
 
   const getStatusBadgeStyles = (status) => {
@@ -89,7 +115,6 @@ const PatientSummary = () => {
     });
       return (
     <div className="p-2 relative">
-      {/* Upper Action Header Layout */}
       <div className="flex items-center justify-between mb-6 border-b border-slate-200/60 pb-5">
         <div className="flex items-center gap-2.5 text-slate-900">
           <Users size={22} className="stroke-[2.5]" /> 
@@ -101,7 +126,6 @@ const PatientSummary = () => {
         </button>
       </div>
 
-      {/* Grid Multi-Filter Container Block Panel */}
       {patients.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
           <div className="relative flex items-center">
@@ -143,7 +167,6 @@ const PatientSummary = () => {
         </div>
       )}
 
-      {/* Main Core Database Data Table Frame Element */}
       {patients.length === 0 ? (
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
           <div className="p-3 bg-slate-50 text-slate-400 rounded-full w-fit mb-3"><Users size={28} /></div>
@@ -170,7 +193,7 @@ const PatientSummary = () => {
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
                 {processedPatients.map((patient, index) => (
-                  <tr key={patient.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={patient._id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-3.5 text-slate-400 text-center font-semibold">{index + 1}</td>
                     <td className="px-6 py-3.5 text-slate-400 whitespace-nowrap">{patient.dateAdmission}</td>
                     <td className="px-6 py-3.5 font-bold text-slate-800">{patient.name}</td>
@@ -201,7 +224,6 @@ const PatientSummary = () => {
         </div>
       )}
 
-      {/* Mount Isolated Read-Only Detailed Sheet Drawer */}
       <PatientDetailDrawer
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
@@ -209,7 +231,6 @@ const PatientSummary = () => {
         getStatusBadgeStyles={getStatusBadgeStyles}
       />
 
-      {/* Mount Interactive Creation and Editing Form Drawer */}
       <AddPatientDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
@@ -222,4 +243,3 @@ const PatientSummary = () => {
 };
 
 export default PatientSummary;
-
