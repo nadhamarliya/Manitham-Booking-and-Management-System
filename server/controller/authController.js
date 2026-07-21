@@ -16,7 +16,8 @@ const login = async (req, res) => {
 
         const user = await User.findOne({ email: loginIdentifier.toLowerCase().trim() });
         if (!user) {
-            return res.status(404).json({ success: false, error: "Invalid email or password" });
+            // FIXED: Throw a 400 Bad Request instead of a 404 for bad emails
+            return res.status(400).json({ success: false, error: "Invalid email or password" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -26,11 +27,12 @@ const login = async (req, res) => {
 
         const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_KEY, { expiresIn: "10d" });
 
+        // FIXED: Set cross-site compatibility flags to pass cookies between Vercel and Render
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 10 * 24 * 60 * 60 * 1000
+            secure: true,        // REQUIRED: Must be true for HTTPS data streaming
+            sameSite: "none",    // REQUIRED: Tells Chrome/Safari to allow cookies across different domains
+            maxAge: 10 * 24 * 60 * 60 * 1000 // 10 days
         });
 
         return res.status(200).json({ 
