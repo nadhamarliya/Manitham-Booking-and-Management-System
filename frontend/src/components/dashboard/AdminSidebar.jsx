@@ -69,7 +69,7 @@ const Sidebar = () => {
       )}
 
       {/* RESPONSIVE MENU DRAWER CONTAINER */}
-      <div className={`bg-slate-900 text-white h-[100dvh] fixed top-0 bottom-0 left-0 w-[260px] border-r border-white/5 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      <div className={`bg-slate-900 text-white h-[100dvh] fixed top-0 bottom-0 pt-16 left-0 w-[260px] border-r border-white/5 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
@@ -82,7 +82,7 @@ const Sidebar = () => {
           </div>
 
           {/* FIXED: Dynamic padding adjustment clears the mobile header gap cleanly */}
-          <div className="px-4 mb-4 mt-16 lg:mt-4">
+          <div className="px-4 mb-4 mt-4">
             <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.05] rounded-xl">
               <div className="h-9 w-9 rounded-lg bg-white/10 flex items-center justify-center text-sm font-semibold text-slate-300 uppercase shrink-0">
                 {userName.charAt(0)}
