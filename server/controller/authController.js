@@ -14,7 +14,13 @@ const login = async (req, res) => {
             return res.status(400).json({ success: false, error: "Email or username is required" });
         }
 
-        const user = await User.findOne({ email: loginIdentifier.toLowerCase().trim() });
+        const user = await User.findOne({
+    $or: [
+        { email: loginIdentifier.toLowerCase().trim() },
+        { username: loginIdentifier.trim() }
+    ]
+});
+
         if (!user) {
             return res.status(404).json({ success: false, error: "Invalid email or password" });
         }

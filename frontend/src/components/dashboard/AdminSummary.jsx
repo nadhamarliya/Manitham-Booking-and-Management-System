@@ -41,24 +41,20 @@ const AdminSummary = () => {
 
   // Fetch today's slot configuration directly from DB
   const fetchDailySlots = async () => {
-  try {
-    const token = localStorage.getItem('manitham_token'); // Retrieve token
-
-    const response = await fetch(`${API_BASE_URL}/slots/${todayKey}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`, // Pass token
-        'Content-Type': 'application/json'
+    try {
+      const response = await fetch(`${API_BASE_URL}/slots/${todayKey}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSlots(data.slots);
       }
-    });
-    const data = await response.json();
-    if (data.success) {
-      setSlots(data.slots);
+    } catch (error) {
+      console.error("Error loading slots:", error);
     }
-  } catch (error) {
-    console.error("Error loading daily appointment configurations:", error);
-  }
-};
+  };
+
 
 // Apply this exact headers dictionary pattern to your fetchSponsors function as well!
 
