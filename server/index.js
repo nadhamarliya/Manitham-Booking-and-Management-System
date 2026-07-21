@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import cookieParser from 'cookie-parser'; // Import cookie parser
+import cookieParser from 'cookie-parser'; 
 import dotenv from 'dotenv';
 import connectToDatabase from './db/db.js';
 import authRouter from './routes/auth.js';
@@ -12,12 +12,21 @@ connectToDatabase();
 
 const app = express();
 
+// 1. Fully configured CORS block
 app.use(cors({
     origin: ["http://localhost:5173", "https://manitham-portal.vercel.app"],
-    credentials: true // Crucial: Allows frontend cross-origin requests to receive cookies
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 app.use(express.json());
-app.use(cookieParser()); // Initialize cookie parser middleware layer
+app.use(cookieParser()); 
+
+// 2. Added root route to prevent 404/CORS routing crashes
+app.get('/', (req, res) => {
+    res.status(200).send("Manitham Server API is live.");
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api/sponsor', sponsorRouter);
