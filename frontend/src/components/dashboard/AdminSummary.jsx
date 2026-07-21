@@ -40,20 +40,24 @@ const AdminSummary = () => {
   const [selectedSlot, setSelectedSlot] = useState(null);
 
   // Fetch today's slot configuration directly from DB
-  const fetchDailySlots = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/slots/${todayKey}`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if (data.success) {
-        setSlots(data.slots);
+const fetchDailySlots = async () => {
+  try {
+    const token = localStorage.getItem('manitham_token'); 
+
+    const response = await fetch(`${API_BASE_URL}/slots/${todayKey}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Pass header token string
+        'Content-Type': 'application/json'
       }
-    } catch (error) {
-      console.error("Error loading slots:", error);
-    }
-  };
+    });
+    const data = await response.json();
+    if (data.success) setSlots(data.slots);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 
 // Apply this exact headers dictionary pattern to your fetchSponsors function as well!
@@ -62,18 +66,24 @@ const AdminSummary = () => {
   // Fetch global sponsors list to calculate reminder alerts
   const fetchSponsors = async () => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       const response = await fetch(`${API_BASE_URL}/list`, { 
         method: 'GET',
-        credentials: 'include' 
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       const data = await response.json();
       if (data.success) {
         setSponsors(data.sponsors);
       }
     } catch (error) {
-      console.error("Error fetching live sponsors for alert logs:", error);
+      console.error("Error fetching sponsors:", error);
     }
   };
+
 
   useEffect(() => {
     fetchDailySlots();
@@ -103,10 +113,14 @@ const AdminSummary = () => {
 
   const handleSaveBooking = async (slotId, updatedData) => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       const response = await fetch(`${API_BASE_URL}/slots/book`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({
           dateKey: todayKey,
           slotNumber: selectedSlot.slotNumber,
@@ -118,14 +132,15 @@ const AdminSummary = () => {
       });
 
       if (response.ok) {
-        fetchDailySlots(); // Refresh slots directly from DB
-        fetchSponsors();   // Refresh reminders log metrics
+        fetchDailySlots(); 
+        fetchSponsors();   
       }
     } catch (error) {
       console.error("Error saving slot selection:", error);
     }
     setIsDrawerOpen(false);
   };
+
     return (
     <div className="p-2 relative space-y-8">
       

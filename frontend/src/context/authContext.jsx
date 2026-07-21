@@ -10,17 +10,32 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const verifyUserSession = async () => {
             try {
-                // RESTORED: Directly hit the backend verification endpoint with cookies enabled
-                const response = await axios.get('https://onrender.com', {
-                    withCredentials: true // MANDATORY: Automatically transmits HTTP-Only cookies
-                });
+                // 1. Read the token out of local storage
+                const token = localStorage.getItem('manitham_token');
+                
+                if (!token) {
+                    setLoading(false);
+                    return;
+                }
+
+                // FIXED: Appended the full, proper /api/auth/verify endpoint path
+                const response = await axios.get(
+                    'https://onrender.com', 
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
 
                 if (response.data.success) {
                     setUser(response.data.user);
                 } else {
+                    localStorage.removeItem('manitham_token');
                     setUser(null);
                 }
             } catch (error) {
+                localStorage.removeItem('manitham_token');
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -33,8 +48,9 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
     };
 
-    // RESTORED: Clean logout structure mapping your local app state clear loop
+    // Wipe token on logout
     const logout = () => {
+        localStorage.removeItem('manitham_token');
         setUser(null);
     };
 

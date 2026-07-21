@@ -19,9 +19,14 @@ const PatientSummary = () => {
 
   const fetchPatients = async () => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       const response = await fetch(`${API_BASE_URL}/list`, { 
         method: 'GET',
-        credentials: 'include' 
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       const data = await response.json();
       if (data.success) {
@@ -31,6 +36,7 @@ const PatientSummary = () => {
       console.error("Error retrieving medical records:", error);
     }
   };
+
 
   useEffect(() => {
     fetchPatients();
@@ -53,19 +59,25 @@ const PatientSummary = () => {
 
   const handleSavePatient = async (patientData) => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       if (editingPatient) {
         const response = await fetch(`${API_BASE_URL}/update/${editingPatient._id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json' 
+          },
           body: JSON.stringify(patientData)
         });
         if (response.ok) fetchPatients();
       } else {
         const response = await fetch(`${API_BASE_URL}/add`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json' 
+          },
           body: JSON.stringify(patientData)
         });
         if (response.ok) fetchPatients();
@@ -76,11 +88,17 @@ const PatientSummary = () => {
     }
   };
 
+
   const handleDeletePatient = async (id) => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       const response = await fetch(`${API_BASE_URL}/delete/${id}`, {
         method: 'DELETE',
-        credentials: 'include'
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       if (response.ok) fetchPatients();
       setIsDrawerOpen(false);

@@ -15,9 +15,14 @@ const SponsorSummary = () => {
   // Fetch data directly from DB using credentials (cookies)
   const fetchSponsors = async () => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       const response = await fetch(`${API_BASE_URL}/list`, { 
         method: 'GET',
-        credentials: 'include' 
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       const data = await response.json();
       if (data.success) {
@@ -27,6 +32,7 @@ const SponsorSummary = () => {
       console.error("Error retrieving sponsor logs:", error);
     }
   };
+
 
   useEffect(() => {
     fetchSponsors();
@@ -44,19 +50,25 @@ const SponsorSummary = () => {
 
   const handleSaveSponsor = async (sponsorData) => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       if (editingSponsor) {
         const response = await fetch(`${API_BASE_URL}/update/${editingSponsor._id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json' 
+          },
           body: JSON.stringify(sponsorData)
         });
         if (response.ok) fetchSponsors();
       } else {
         const response = await fetch(`${API_BASE_URL}/add`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json' 
+          },
           body: JSON.stringify(sponsorData)
         });
         if (response.ok) fetchSponsors();
@@ -67,11 +79,17 @@ const SponsorSummary = () => {
     }
   };
 
+
   const handleDeleteSponsor = async (id) => {
     try {
+      const token = localStorage.getItem('manitham_token');
+
       const response = await fetch(`${API_BASE_URL}/delete/${id}`, {
         method: 'DELETE',
-        credentials: 'include'
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       if (response.ok) fetchSponsors();
       setIsDrawerOpen(false);
@@ -79,6 +97,7 @@ const SponsorSummary = () => {
       console.error("Error clear record item execution:", error);
     }
   };
+
 
   const getTypeBadgeStyles = (type) => {
     switch (type) {

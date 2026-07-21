@@ -57,14 +57,25 @@ export const saveSlotBooking = async (req, res) => {
         );
 
         // 2. Clone it as a persistent "Food" sponsor record if it's a new booking
+                // 2. Clone it as a persistent "Food" sponsor record if it does not exist yet
         if (status !== 'Empty' && name && phone) {
-            const newFoodSponsor = new Sponsor({
+            const existingSponsor = await Sponsor.findOne({
                 date: dateKey,
                 name: name.trim(),
                 phone: phone.trim(),
                 type: 'Food'
             });
-            await newFoodSponsor.save();
+
+            // Only create a new profile row if it's a completely unique booking
+            if (!existingSponsor) {
+                const newFoodSponsor = new Sponsor({
+                    date: dateKey,
+                    name: name.trim(),
+                    phone: phone.trim(),
+                    type: 'Food'
+                });
+                await newFoodSponsor.save();
+            }
         }
 
         return res.status(200).json({ 

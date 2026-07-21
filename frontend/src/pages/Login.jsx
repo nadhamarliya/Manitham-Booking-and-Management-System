@@ -29,18 +29,16 @@ const Login = () => {
             const response = await axios.post('https://manitham-portal.onrender.com/api/auth/login', { 
                 email: email.trim(), 
                 password 
-            }, { withCredentials: true });
+            });
             
             if (response.data.success) {
-                if (rememberMe) {
-                    localStorage.setItem('manitham_remembered_email', email.trim());
-                } else {
-                    localStorage.removeItem('manitham_remembered_email');
-                }
+    // Save token string securely inside local storage memory
+    localStorage.setItem('manitham_token', response.data.token);
+    
+    login(response.data.user);
+    navigate('/dashboard');
+}
 
-                login(response.data.user);
-                navigate('/dashboard');
-            }
         } catch (error) {
             if (error.response && error.response.data.error) {
                 setError(error.response.data.error);

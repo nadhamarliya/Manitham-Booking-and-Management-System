@@ -36,41 +36,63 @@ const AddStaffDrawer = ({ isOpen, onClose, onSaveSuccess, staffMember }) => {
     setIsSubmitting(true);
     
     try {
+      // 1. Read token from local storage
+      const token = localStorage.getItem('manitham_token');
+      
+      // 2. Build header configuration dictionary
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
       if (staffMember) {
-        // UPDATE MODE: Trigger PUT route pathway endpoint
-        const response = await axios.put(`https://manitham-portal.onrender.com/api/auth/update-staff/${staffMember._id}`, {
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          password: password, // Only carries over values if a fresh string was explicitly typed
-          role: role
-        }, { withCredentials: true });
+        // UPDATE MODE: Trigger PUT request with headers
+        const response = await axios.put(
+          `https://manitham-portal.onrender.com/api/auth/update-staff/${staffMember._id}`, 
+          {
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            password: password, 
+            role: role
+          }, 
+          config
+        );
 
         if (response.data.success) {
           onSaveSuccess();
         }
       } else {
-        // CREATION MODE: Trigger POST route pathway endpoint
-        const response = await axios.post('https://manitham-portal.onrender.com/api/auth/register-staff', {
-          name: name.trim(),
-          username: email.trim().toLowerCase(),
-          password: password,
-          role: role
-        }, { withCredentials: true });
+        // CREATION MODE: Trigger POST request with headers
+        const response = await axios.post(
+          'https://manitham-portal.onrender.com/api/auth/register-staff', 
+          {
+            name: name.trim(),
+            username: email.trim().toLowerCase(),
+            password: password,
+            role: role
+          }, 
+          config
+        );
 
         if (response.data.success) {
           onSaveSuccess();
         }
       }
     } catch (err) {
+      // RESTORED: Catch block prevents compile crashes
       if (err.response && err.response.data.error) {
         setError(err.response.data.error);
       } else {
         setError("Failed to communicate with database server.");
       }
     } finally {
+      // RESTORED: Finally block unlocks button states
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <>

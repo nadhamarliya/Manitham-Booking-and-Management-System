@@ -18,7 +18,20 @@ const StaffSummary = () => {
   // Fetch live staff list directly from MongoDB Atlas on page mount
   const fetchStaffData = async () => {
     try {
-      const response = await axios.get('https://manitham-portal.onrender.com/api/auth/staff-list', { withCredentials: true });
+      // 1. Read token from local storage
+      const token = localStorage.getItem('manitham_token');
+      
+      // 2. Fetch data with authorization headers
+      const response = await axios.get(
+        'https://manitham-portal.onrender.com/api/auth/staff-list', 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
       if (response.data.success) {
         setStaffList(response.data.staff);
       }
@@ -26,6 +39,7 @@ const StaffSummary = () => {
       setError('Failed to sync directory from database.');
     }
   };
+
 
   useEffect(() => {
     fetchStaffData();
@@ -47,7 +61,20 @@ const StaffSummary = () => {
     if (userRole !== 'admin') return;
     if (window.confirm("Are you sure you want to delete this staff member's portal access?")) {
       try {
-        const response = await axios.delete(`https://manitham-portal.onrender.com/api/auth/delete-staff/${id}`, { withCredentials: true });
+        // 1. Read token from local storage
+        const token = localStorage.getItem('manitham_token');
+
+        // 2. Execute deletion request with headers
+        const response = await axios.delete(
+          `https://manitham-portal.onrender.com/api/auth/delete-staff/${id}`, 
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
         if (response.data.success) {
           fetchStaffData();
         }
@@ -56,6 +83,7 @@ const StaffSummary = () => {
       }
     }
   };
+
 
   const processedStaff = staffList
     .filter((member) => {

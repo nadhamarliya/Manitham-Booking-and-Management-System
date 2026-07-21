@@ -6,20 +6,34 @@ export const addSponsor = async (req, res) => {
         const { date, name, phone, type, amount, paymentType, slotId } = req.body;
 
         // If the request comes from the Appointment Slots drawer, it contains a slotId
+        // If the request comes from the Appointment Slots drawer, it contains a slotId
         if (slotId && name && phone) {
-            const newAppointmentSponsor = new Sponsor({
-                date: date || new Date().toISOString().split('T')[0], // Use incoming date or default to today
+            const parsedDate = date || new Date().toISOString().split('T')[0];
+
+            // FIXED: Prevent creating duplicate food sponsor logs on multi-saves
+            const existingSponsor = await Sponsor.findOne({
+                date: parsedDate,
                 name: name.trim(),
                 phone: phone.trim(),
-                type: 'Food' // Automatically set type to Food for appointment bookings
+                type: 'Food'
             });
 
-            await newAppointmentSponsor.save();
+            if (!existingSponsor) {
+                const newAppointmentSponsor = new Sponsor({
+                    date: parsedDate,
+                    name: name.trim(),
+                    phone: phone.trim(),
+                    type: 'Food'
+                });
+                await newAppointmentSponsor.save();
+            }
+
             return res.status(201).json({ 
                 success: true, 
                 message: "Slot allocation successfully saved as a Food sponsor in MongoDB!" 
             });
         }
+
 
         // Standard path: Handles submissions directly from the AddSponsorDrawer component form
         const newSponsor = new Sponsor({

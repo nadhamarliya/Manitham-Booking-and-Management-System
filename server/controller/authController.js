@@ -14,15 +14,17 @@ const login = async (req, res) => {
             return res.status(400).json({ success: false, error: "Email or username is required" });
         }
 
+        // Correct dual query structure
         const user = await User.findOne({
-    $or: [
-        { email: loginIdentifier.toLowerCase().trim() },
-        { username: loginIdentifier.trim() }
-    ]
-});
+            $or: [
+                { email: loginIdentifier.toLowerCase().trim() },
+                { username: loginIdentifier.trim() }
+            ]
+        });
 
         if (!user) {
-            return res.status(404).json({ success: false, error: "Invalid email or password" });
+            // FIXED: Swapped 404 for 400 validation error
+            return res.status(400).json({ success: false, error: "Invalid email or password" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -30,25 +32,20 @@ const login = async (req, res) => {
             return res.status(400).json({ success: false, error: "Invalid email or password" });
         }
 
-        // Token generation payload uses '_id'
+        // Generate raw encrypted token string
         const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_KEY, { expiresIn: "10d" });
 
-        // RESTORED: Back to standard HTTP-Only Cookie structure
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,        // Enforces HTTPS for production cross-site tracking
-            sameSite: "none",    // Bridges cross-site communication between Vercel and Render
-            maxAge: 10 * 24 * 60 * 60 * 1000
-        });
-
+        // FIXED: Removed res.cookie completely and returned token in the JSON response payload
         return res.status(200).json({ 
             success: true, 
+            token: token, 
             user: { _id: user._id, name: user.name, role: user.role } 
         });
     } catch (error) {
         return res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 // 2. Token-Free Validation verification hook check
 const verify = async (req, res) => {
