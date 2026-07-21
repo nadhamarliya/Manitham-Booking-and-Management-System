@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'; // FIXED: Imported useEffect hook
-import { NavLink , useNavigate } from 'react-router-dom'; 
+import React, { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../context/authContext.jsx'; 
 import { 
   User, 
@@ -21,15 +21,13 @@ const Sidebar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  // FIXED: Locks the background website body scrolling when the menu slides open
+  // Freezes background scrolling on phones when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-
-    // Cleans up the background block if the user changes pages completely
     return () => {
       document.body.style.overflow = '';
     };
@@ -68,20 +66,31 @@ const Sidebar = () => {
         />
       )}
 
-      {/* RESPONSIVE MENU DRAWER CONTAINER */}
-      <div className={`bg-slate-900 text-white h-[100dvh] fixed top-0 bottom-0 pt-16 left-0 w-[260px] border-r border-white/5 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      {/* RESTORED: Master Container reverts back to your original structural heights */}
+      <div className={`bg-slate-900 text-white h-[100dvh] fixed top-0 bottom-0 left-0 w-[260px] border-r border-white/5 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
-        {/* UPPER CONTENT CONTAINER (Scrolls inside itself if items expand) */}
+        {/* UPPER CONTENT CONTAINER */}
         <div className="flex-1 flex flex-col overflow-y-auto min-h-0">
           
-          {/* FIXED desktop title header spacing */}
+          {/* RESTORED: Your original beautiful desktop branding stays intact */}
           <div className="px-5 pt-6 pb-2 hidden lg:flex items-center gap-3">
             <h2 className="font-bold text-[20px] tracking-wide leading-tight">Manitham Portal</h2>
           </div>
 
-          {/* FIXED: Dynamic padding adjustment clears the mobile header gap cleanly */}
+          {/* 
+            FIXED MOBLIE TEXT: 
+            - Visible ONLY on phones/tablets (lg:hidden)
+            - Replaces the blank gap with your portal title text to fill the area beautifully!
+          */}
+          <div className="px-5 pt-6 pb-2 block lg:hidden">
+            <h2 className="font-bold text-[20px] tracking-wide leading-tight text-white/90">
+              Manitham Portal
+            </h2>
+          </div>
+
+          {/* RESTORED: Reverted your user block layout settings exactly back to normal */}
           <div className="px-4 mb-4 mt-4">
             <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.05] rounded-xl">
               <div className="h-9 w-9 rounded-lg bg-white/10 flex items-center justify-center text-sm font-semibold text-slate-300 uppercase shrink-0">
@@ -131,7 +140,7 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* FIXED LOWER LOGOUT PANEL */}
+        {/* LOGOUT BUTTON (Stays locked to bottom layout lines) */}
         <div className="p-4 border-t border-white/5 bg-slate-900 shrink-0">
           <button 
             onClick={handleLogout}
