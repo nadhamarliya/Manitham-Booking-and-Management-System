@@ -8,41 +8,35 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
-    const verifyUserSession = async () => {
-        try {
-            const token = localStorage.getItem('manitham_token');
-            if (!token) {
-                setLoading(false);
-                return;
-            }
+        const verifyUserSession = async () => {
+            try {
+                // RESTORED: Directly hit the backend verification endpoint with cookies enabled
+                const response = await axios.get('https://onrender.com', {
+                    withCredentials: true // MANDATORY: Automatically transmits HTTP-Only cookies
+                });
 
-            const response = await axios.get('https://onrender.com', {
-                headers: {
-                    'Authorization': `Bearer ${token}` // Pass token safely via headers
+                if (response.data.success) {
+                    setUser(response.data.user);
+                } else {
+                    setUser(null);
                 }
-            });
-
-            if (response.data.success) {
-                setUser(response.data.user);
-            } else {
-                localStorage.removeItem('manitham_token');
+            } catch (error) {
                 setUser(null);
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            localStorage.removeItem('manitham_token');
-            setUser(null);
-        } finally {
-            setLoading(false);
-        }
-    };
-    verifyUserSession();
-}, []); 
+        };
+        verifyUserSession();
+    }, []); 
 
-// Also update your logout function to wipe the token:
-const logout = () => {
-    localStorage.removeItem('manitham_token');
-    setUser(null);
-};
+    const login = (userData) => {
+        setUser(userData);
+    };
+
+    // RESTORED: Clean logout structure mapping your local app state clear loop
+    const logout = () => {
+        setUser(null);
+    };
 
     return (
         <userContext.Provider value={{ user, login, logout, loading }}>

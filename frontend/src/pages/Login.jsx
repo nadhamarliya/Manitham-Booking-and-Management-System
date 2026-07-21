@@ -23,32 +23,32 @@ const Login = () => {
     }, []);
 
     const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setError(''); 
-    try {
-        const response = await axios.post('https://onrender.com', { 
-            email: email.trim(), 
-            password 
-        }); // withCredentials is no longer needed
-        
-        if (response.data.success) {
-            // Save token to localStorage for authenticated requests
-            localStorage.setItem('manitham_token', response.data.token);
+        e.preventDefault();
+        setError(''); 
+        try {
+            const response = await axios.post('https://manitham-portal.onrender.com/api/auth/login', { 
+                email: email.trim(), 
+                password 
+            }, { withCredentials: true });
+            
+            if (response.data.success) {
+                if (rememberMe) {
+                    localStorage.setItem('manitham_remembered_email', email.trim());
+                } else {
+                    localStorage.removeItem('manitham_remembered_email');
+                }
 
-            if (rememberMe) {
-                localStorage.setItem('manitham_remembered_email', email.trim());
-            } else {
-                localStorage.removeItem('manitham_remembered_email');
+                login(response.data.user);
+                navigate('/dashboard');
             }
-
-            login(response.data.user);
-            navigate('/dashboard');
+        } catch (error) {
+            if (error.response && error.response.data.error) {
+                setError(error.response.data.error);
+            } else {
+                setError("Invalid credentials or Server Database Offline");
+            }
         }
-    } catch (error) {
-        setError(error.response?.data?.error || "Invalid credentials");
-    }
-};
-
+    };
     
     return (
     <div className="flex flex-col items-center h-screen justify-center bg-[#0f172a] p-4">
