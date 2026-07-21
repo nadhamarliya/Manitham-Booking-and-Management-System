@@ -137,9 +137,10 @@ const AdminSummary = () => {
     <div className="p-2 relative space-y-8 w-full overflow-hidden">
       
       {/* Header Layout */}
-      <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200/60 pb-4 text-slate-900">
-        <Calendar size={22} className="stroke-[2.5] shrink-0" /> 
-        <h2 className="text-lg lg:text-xl font-black tracking-wider uppercase break-words max-w-full">
+      <div className="flex flex-nowrap items-center gap-2 border-b border-slate-200/60 pb-4 text-slate-900 w-full overflow-hidden">
+        <Calendar size={20} className="stroke-[2.5] shrink-0" /> 
+        {/* FIXED: Changed text size to scale smoothly on narrow mobile view screens to prevent line wraps */}
+        <h2 className="text-sm sm:text-base md:text-lg lg:text-xl font-black tracking-wider uppercase whitespace-nowrap truncate flex-1">
           Appointments - {todayDateString}
         </h2>
       </div>

@@ -87,17 +87,22 @@ const StaffSummary = () => {
       if (sortBy === 'name-za') return b.name?.localeCompare(a.name);
       return 0;
     });
+
   return (
     <div className="p-2 relative w-full overflow-hidden">
       {/* Upper Action Header Layout */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-200/60 pb-5">
-        <div className="flex items-center gap-2.5 text-slate-900">
-          <ShieldAlert size={22} className="stroke-[2.5]" /> 
-          <h2 className="text-xl font-black tracking-wider uppercase">Portal Access & Staff Registry</h2>
+      {/* FIXED: Replaced wrap behaviors with flex-col on phone viewports and flex-nowrap constraints */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-200/60 pb-5">
+        <div className="flex flex-nowrap items-center gap-2 text-slate-900 overflow-hidden w-full sm:w-auto">
+          <ShieldAlert size={20} className="stroke-[2.5] shrink-0" /> 
+          {/* FIXED: Dynamic fluid heading font sizes force single-line visibility tracking across mobile viewports */}
+          <h2 className="text-sm sm:text-base md:text-lg lg:text-xl font-black tracking-wider uppercase whitespace-nowrap truncate flex-1">
+            Portal Access & Staff Registry
+          </h2>
         </div>
         
         {userRole === 'admin' && (
-          <button onClick={handleOpenAddDrawer} className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all">
+          <button onClick={handleOpenAddDrawer} className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all shrink-0">
             <Plus size={16} className="stroke-[2.5]" />
             <span>Add Staff Member</span>
           </button>
@@ -107,7 +112,6 @@ const StaffSummary = () => {
       {error && <p className="text-red-500 text-xs font-semibold p-3 bg-red-50 rounded-xl border border-red-100 mb-4">{error}</p>}
 
       {staffList.length > 0 && (
-        /* FIXED: Changed md:grid-cols-2 to sm:grid-cols-2 to stack search inputs beautifully on mobile */
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
           <div className="relative flex items-center">
             <Search size={16} className="absolute left-3.5 text-slate-400" />
@@ -133,7 +137,6 @@ const StaffSummary = () => {
           <p className="text-sm font-semibold text-slate-500">No matching search credentials located</p>
         </div>
       ) : (
-        /* FIXED: w-full overflow-x-auto enables a smooth swipe scrollbar tracking on horizontal tables for phones */
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden w-full">
           <div className="w-full overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[650px]">

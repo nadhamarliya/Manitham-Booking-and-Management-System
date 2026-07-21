@@ -8,7 +8,6 @@ const AddSponsorDrawer = ({ isOpen, onClose, onSave, onDelete, editingSponsor })
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [type, setType] = useState('');
-  // New conditional states
   const [amount, setAmount] = useState('');
   const [paymentType, setPaymentType] = useState('');
 
@@ -39,7 +38,6 @@ const AddSponsorDrawer = ({ isOpen, onClose, onSave, onDelete, editingSponsor })
       type: type || 'Food' 
     };
 
-    // Attach conditional parameters only if money type is selected
     if (type === 'Money') {
       payload.amount = Number(amount);
       payload.paymentType = paymentType || 'One-time';
@@ -52,15 +50,20 @@ const AddSponsorDrawer = ({ isOpen, onClose, onSave, onDelete, editingSponsor })
     <>
       <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50" onClick={onClose} />
 
-      <form onSubmit={handleSubmit} className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col border-l border-slate-100">
+      {/* 
+        FIXED: 
+        - Changed 'w-full max-w-md' to 'w-full sm:max-w-md' to sit nicely on narrow mobile viewports.
+      */}
+      <form onSubmit={handleSubmit} className="fixed inset-y-0 right-0 w-full sm:max-w-md bg-white shadow-2xl z-50 flex flex-col border-l border-slate-100 transition-all duration-300">
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-800">{editingSponsor ? 'Update Sponsor Profile' : 'Add New Sponsor'}</h2>
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 text-slate-400 rounded-xl"><X size={20} /></button>
+          <button type="button" onClick={onClose} className="p-1.5 text-slate-400 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"><X size={20} /></button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+        {/* FIXED: Reduced padding to p-4 on small phones to maximize layout real estate */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Registration Date</label>
             <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -106,12 +109,12 @@ const AddSponsorDrawer = ({ isOpen, onClose, onSave, onDelete, editingSponsor })
         <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3 mt-auto">
           <div>
             {editingSponsor ? (
-              <button type="button" onClick={() => onDelete(editingSponsor._id)} className="px-4 py-2.5 text-sm font-semibold text-rose-500 hover:bg-rose-50 rounded-xl cursor-pointer">Delete</button>
+              <button type="button" onClick={() => onDelete(editingSponsor._id)} className="px-4 py-2.5 text-sm font-semibold text-rose-500 hover:bg-rose-50 rounded-xl cursor-pointer transition-colors">Delete</button>
             ) : (
-              <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-600 rounded-xl cursor-pointer">Close</button>
+              <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-600 rounded-xl cursor-pointer transition-colors">Close</button>
             )}
           </div>
-          <button type="submit" className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm cursor-pointer">{editingSponsor ? 'Save Changes' : 'Add Sponsor'}</button>
+          <button type="submit" className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm cursor-pointer transition-colors">{editingSponsor ? 'Save Changes' : 'Add Sponsor'}</button>
         </div>
       </form>
     </>
