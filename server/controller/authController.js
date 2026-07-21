@@ -28,11 +28,10 @@ const login = async (req, res) => {
         const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_KEY, { expiresIn: "10d" });
 
         // FIXED: Set cross-site compatibility flags to pass cookies between Vercel and Render
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,        // REQUIRED: Must be true for HTTPS data streaming
-            sameSite: "none",    // REQUIRED: Tells Chrome/Safari to allow cookies across different domains
-            maxAge: 10 * 24 * 60 * 60 * 1000 // 10 days
+        return res.status(200).json({ 
+            success: true, 
+            token: token, // Sent directly to the client
+            user: { _id: user._id, name: user.name, role: user.role } 
         });
 
         return res.status(200).json({ 

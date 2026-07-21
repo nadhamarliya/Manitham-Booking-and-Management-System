@@ -8,40 +8,41 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
-        const verifyUserSession = async () => {
-            try {
-                // Production change: Fire a network request to verify the browser's HTTP-Only session cookie
-                const response = await axios.get('https://manitham-portal.onrender.com/api/auth/verify', {
-                    withCredentials: true // MANDATORY: Instructs the browser to pass along the session cookie securely
-                });
-
-                if (response.data.success) {
-                    setUser(response.data.user);
-                } else {
-                    setUser(null);
-                }
-            } catch (error) {
-                setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-        verifyUserSession();
-    }, []); 
-
-    const login = (userData) => {
-        setUser(userData);
-    };
-
-    const logout = async () => {
+    const verifyUserSession = async () => {
         try {
-            // Optional: You can hit a backend signout route to clear the cookie, 
-            // or simply wipe the user state locally to kill the active session
-            setUser(null);
+            const token = localStorage.getItem('manitham_token');
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+
+            const response = await axios.get('https://onrender.com', {
+                headers: {
+                    'Authorization': `Bearer ${token}` // Pass token safely via headers
+                }
+            });
+
+            if (response.data.success) {
+                setUser(response.data.user);
+            } else {
+                localStorage.removeItem('manitham_token');
+                setUser(null);
+            }
         } catch (error) {
+            localStorage.removeItem('manitham_token');
             setUser(null);
+        } finally {
+            setLoading(false);
         }
     };
+    verifyUserSession();
+}, []); 
+
+// Also update your logout function to wipe the token:
+const logout = () => {
+    localStorage.removeItem('manitham_token');
+    setUser(null);
+};
 
     return (
         <userContext.Provider value={{ user, login, logout, loading }}>
