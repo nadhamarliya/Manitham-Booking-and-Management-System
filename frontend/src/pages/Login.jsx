@@ -32,13 +32,10 @@ const Login = () => {
             });
             
             if (response.data.success) {
-    // Save token string securely inside local storage memory
-    localStorage.setItem('manitham_token', response.data.token);
-    
-    login(response.data.user);
-    navigate('/dashboard');
-}
-
+                localStorage.setItem('manitham_token', response.data.token);
+                login(response.data.user);
+                navigate('/dashboard');
+            }
         } catch (error) {
             if (error.response && error.response.data.error) {
                 setError(error.response.data.error);
@@ -47,14 +44,18 @@ const Login = () => {
             }
         }
     };
-    
-    return (
-    <div className="flex flex-col items-center h-screen justify-center bg-[#0f172a] p-4">
-      <h2 className="font-sevillana text-4xl font-bold text-white mb-6 drop-shadow-sm">
+        return (
+    /* 
+      FIXED: 
+      - Swapped 'h-screen' for 'min-h-screen py-8' to allow scrolling on small phone screens when virtual keyboards slide up.
+    */
+    <div className="flex flex-col items-center min-h-screen justify-center bg-[#0f172a] p-4 py-8 w-full overflow-y-auto">
+      <h2 className="font-sevillana text-3xl sm:text-4xl font-bold text-white mb-6 drop-shadow-sm text-center">
         Manitham Portal
       </h2>
       
-      <div className="border border-slate-800 shadow-xl p-8 w-full max-w-sm bg-white rounded-lg transition-all duration-300">
+      {/* FIXED: Changed max-w-sm to max-w-md w-full to make the form card adapt fluidly to small phone screen widths */}
+      <div className="border border-slate-800 shadow-xl p-6 sm:p-8 w-full max-w-md bg-white rounded-lg transition-all duration-300">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Login</h2>
         <form onSubmit={handleLoginSubmit}>
           {error && <p className="text-red-500 text-xs font-semibold text-center mb-4 bg-red-50 p-2.5 rounded-xl border border-red-100">{error}</p>}
@@ -63,7 +64,7 @@ const Login = () => {
             <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-1">Email Address</label>
             <input 
               type="email" 
-              className="w-full px-3 py-2 border text-sm rounded focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800" 
+              className="w-full px-3 py-2.5 border text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 bg-slate-50" 
               placeholder="name@example.com" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -76,31 +77,31 @@ const Login = () => {
             <div className="relative flex items-center">
               <input 
                 type={showPassword ? "text" : "password"} 
-                className="w-full px-3 py-2 border text-sm rounded focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 pr-10" 
+                className="w-full px-3 py-2.5 border text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-800 pr-10 bg-slate-50" 
                 placeholder="******" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors">
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
           <div className="mb-6 flex items-center text-xs">
-            <label className="inline-flex items-center cursor-pointer">
+            <label className="inline-flex items-center cursor-pointer select-none">
               <input 
                 type="checkbox" 
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="form-checkbox text-teal-600 focus:ring-teal-500 accent-teal-600 w-4 h-4 rounded cursor-pointer" 
               />
-              <span className="ml-2 text-gray-600 select-none font-medium">Remember me</span>
+              <span className="ml-2 text-gray-600 font-medium">Remember me</span>
             </label>
           </div>
           
-          <button type="submit" className="w-full bg-[#0f172a] hover:bg-slate-800 text-white font-semibold py-2.5 px-4 rounded transition-colors duration-200 cursor-pointer text-sm">
+          <button type="submit" className="w-full bg-[#0f172a] hover:bg-slate-800 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors duration-200 cursor-pointer text-sm shadow-sm">
             Login
           </button>
         </form>

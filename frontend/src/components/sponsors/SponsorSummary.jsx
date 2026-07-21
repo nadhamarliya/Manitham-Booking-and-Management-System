@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Plus, Pencil, Search, ArrowUpDown, Filter } from 'lucide-react';
 import AddSponsorDrawer from './AddSponsorDrawer';
 
-const API_BASE_URL = "https://manitham-portal.onrender.com/api/sponsor"; 
+const API_BASE_URL = "https://onrender.com"; 
 
 const SponsorSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -12,7 +12,6 @@ const SponsorSummary = () => {
   const [typeFilter, setTypeFilter] = useState('All');
   const [sortBy, setSortBy] = useState('date-newest');
 
-  // Fetch data directly from DB using credentials (cookies)
   const fetchSponsors = async () => {
     try {
       const token = localStorage.getItem('manitham_token');
@@ -32,7 +31,6 @@ const SponsorSummary = () => {
       console.error("Error retrieving sponsor logs:", error);
     }
   };
-
 
   useEffect(() => {
     fetchSponsors();
@@ -79,7 +77,6 @@ const SponsorSummary = () => {
     }
   };
 
-
   const handleDeleteSponsor = async (id) => {
     try {
       const token = localStorage.getItem('manitham_token');
@@ -97,7 +94,6 @@ const SponsorSummary = () => {
       console.error("Error clear record item execution:", error);
     }
   };
-
 
   const getTypeBadgeStyles = (type) => {
     switch (type) {
@@ -121,21 +117,23 @@ const SponsorSummary = () => {
       if (sortBy === 'name-za') return b.name.localeCompare(a.name);
       return 0;
     });
-      return (
-    <div className="p-2 relative">
-      <div className="flex items-center justify-between mb-6 border-b border-slate-200/60 pb-5">
+  return (
+    <div className="p-2 relative w-full overflow-hidden">
+      {/* Upper Action Header Layout */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-200/60 pb-5">
         <div className="flex items-center gap-2.5 text-slate-900">
           <Users size={22} className="stroke-[2.5]" /> 
           <h2 className="text-xl font-black tracking-wider uppercase">Sponsor Details</h2>
         </div>
-        <button onClick={handleOpenAddDrawer} className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all">
+        <button onClick={handleOpenAddDrawer} className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all">
           <Plus size={16} className="stroke-[2.5]" />
           <span>Add Sponsor</span>
         </button>
       </div>
 
+      {/* Grid Multi-Filter Container Block Panel */}
       {sponsors.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
           <div className="relative flex items-center">
             <Search size={16} className="absolute left-3.5 text-slate-400" />
             <input type="text" placeholder="Search by name or phone..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 transition-colors" />
@@ -162,7 +160,8 @@ const SponsorSummary = () => {
         </div>
       )}
 
-            {sponsors.length === 0 ? (
+      {/* Main Core Database Data Table Frame Element */}
+      {sponsors.length === 0 ? (
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-8 text-center min-h-[300px] flex flex-col items-center justify-center">
           <div className="p-3 bg-slate-50 text-slate-400 rounded-full w-fit mb-3"><Users size={28} /></div>
           <h3 className="text-base font-bold text-slate-700">No Sponsors Registered Yet</h3>
@@ -172,9 +171,10 @@ const SponsorSummary = () => {
           <p className="text-sm font-semibold text-slate-500">No matching search entries found</p>
         </div>
       ) : (
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+        /* FIXED: w-full overflow-x-auto allows clean horizontal swipe scrollbar tracking on phones */
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden w-full">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
                   <th className="px-6 py-4 w-16 text-center">S.No</th>
@@ -194,7 +194,6 @@ const SponsorSummary = () => {
                     <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">{sponsor.phone}</td>
                     <td className="px-6 py-3.5">
                       <div className="flex flex-col gap-0.5 items-start">
-                        {/* FIX: Removed the rounded colored badge wrapper styles */}
                         <span className="font-semibold text-slate-700">
                           {sponsor.type}
                         </span>

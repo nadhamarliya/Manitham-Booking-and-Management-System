@@ -138,25 +138,31 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
       bmi
     });
   };
-    return (
+  return (
     <>
       <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50" onClick={onClose} />
 
-      <form onSubmit={handleSubmit} className="fixed inset-y-0 right-0 w-full max-w-xl bg-white shadow-2xl z-50 flex flex-col border-l border-slate-100">
+      {/* 
+        FIXED:
+        - Changed 'w-full max-w-xl' to 'w-full sm:max-w-xl' to match narrow mobile views cleanly.
+      */}
+      <form onSubmit={handleSubmit} className="fixed inset-y-0 right-0 w-full sm:max-w-xl bg-white shadow-2xl z-50 flex flex-col border-l border-slate-100 transition-all duration-300">
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-800">{patient ? 'Update Clinical Registry' : 'Add New Admission'}</h2>
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 text-slate-400 rounded-xl hover:bg-slate-100 transition-colors"><X size={20} /></button>
+          <button type="button" onClick={onClose} className="p-1.5 text-slate-400 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"><X size={20} /></button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Fluid custom padding 'p-4 sm:p-6' drops spacing down perfectly on smartphone frames */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           
           {/* SECTION 1: PRIMARY BIOGRAPHICAL PROFILE */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-widest border-b pb-1.5">1. Admission Information</h3>
             
-            <div className="grid grid-cols-2 gap-4">
+            {/* FIXED: Changed grid-cols-2 to grid-cols-1 sm:grid-cols-2 to stack inputs vertically on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Date of Admission</label>
                 <input type="date" required value={dateAdmission} onChange={(e) => setDateAdmission(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -172,7 +178,8 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
               <input type="text" required placeholder="Enter full name" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* FIXED: Changed grid-cols-2 to grid-cols-1 sm:grid-cols-2 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Date of Birth</label>
                 <input type="date" required value={dob} onChange={(e) => setDob(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -183,7 +190,8 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* FIXED: Changed grid-cols-2 to grid-cols-1 sm:grid-cols-2 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Gender</label>
                 <select required value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-700">
@@ -221,7 +229,8 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-widest border-b pb-1.5">2. Contact & Address Details</h3>
             
-            <div className="grid grid-cols-2 gap-4">
+            {/* FIXED: Changed grid-cols-2 to grid-cols-1 sm:grid-cols-2 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Nationality</label>
                 <input type="text" required placeholder="Nationality" value={nationality} onChange={(e) => setNationality(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -232,7 +241,8 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* FIXED: Changed grid-cols-2 to grid-cols-1 sm:grid-cols-2 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Relationship</label>
                 <input type="text" required placeholder="e.g. Son, Wife" value={relation} onChange={(e) => setRelation(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -242,7 +252,6 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
                 <input type="tel" required placeholder="Mobile number" value={guardianMobile} onChange={(e) => setGuardianMobile(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Alternative Contact Number</label>
               <input type="tel" placeholder="Backup phone number" value={altContact} onChange={(e) => setAltContact(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -253,7 +262,8 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
               <textarea rows="2" required placeholder="Enter full address details" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 resize-none" />
             </div>
           </div>
-                    {/* SECTION 3: RESIDENT CATEGORY SELECTION */}
+
+          {/* SECTION 3: RESIDENT CATEGORY SELECTION */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-widest border-b pb-1.5">3. Resident Medical Category</h3>
             <div>
@@ -292,7 +302,8 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-indigo-600 uppercase tracking-widest border-b pb-1.5">4. Routines & Physical Metrics</h3>
             
-            <div className="grid grid-cols-2 gap-4">
+            {/* FIXED: Changed grid-cols-2 to grid-cols-1 sm:grid-cols-2 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Wake-Up Time</label>
                 <input type="time" value={wakeUpTime} onChange={(e) => setWakeUpTime(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -303,7 +314,8 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            {/* FIXED: Changed grid-cols-3 to grid-cols-1 sm:grid-cols-3 to collapse row columns clean on phones */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Height (cm)</label>
                 <input type="number" placeholder="cm" min="0" value={height} onChange={(e) => setHeight(e.target.value)} className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800" />
@@ -339,5 +351,4 @@ const AddPatientDrawer = ({ isOpen, onClose, onSave, onDelete, patient }) => {
 };
 
 export default AddPatientDrawer;
-
 

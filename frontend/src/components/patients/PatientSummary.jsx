@@ -3,7 +3,7 @@ import { Users, Plus, Pencil, Search, ArrowUpDown, Filter, Eye } from 'lucide-re
 import AddPatientDrawer from './AddPatientDrawer';
 import PatientDetailDrawer from './PatientDetailDrawer';
 
-const API_BASE_URL = "https://manitham-portal.onrender.com/api/patient"; 
+const API_BASE_URL = "https://onrender.com"; 
 
 const PatientSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -36,7 +36,6 @@ const PatientSummary = () => {
       console.error("Error retrieving medical records:", error);
     }
   };
-
 
   useEffect(() => {
     fetchPatients();
@@ -88,7 +87,6 @@ const PatientSummary = () => {
     }
   };
 
-
   const handleDeletePatient = async (id) => {
     try {
       const token = localStorage.getItem('manitham_token');
@@ -131,15 +129,15 @@ const PatientSummary = () => {
       if (sortBy === 'name-za') return b.name?.localeCompare(a.name);
       return 0;
     });
-        return (
-    <div className="p-2 relative">
+      return (
+    <div className="p-2 relative w-full overflow-hidden">
       {/* Upper Action Header Layout */}
-      <div className="flex items-center justify-between mb-6 border-b border-slate-200/60 pb-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-200/60 pb-5">
         <div className="flex items-center gap-2.5 text-slate-900">
           <Users size={22} className="stroke-[2.5]" /> 
           <h2 className="text-xl font-black tracking-wider uppercase">Patient Details</h2>
         </div>
-        <button onClick={handleOpenAddDrawer} className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all">
+        <button onClick={handleOpenAddDrawer} className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all">
           <Plus size={16} className="stroke-[2.5]" />
           <span>Add Patient</span>
         </button>
@@ -147,7 +145,7 @@ const PatientSummary = () => {
 
       {/* Grid Multi-Filter Container Block Panel */}
       {patients.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
           <div className="relative flex items-center">
             <Search size={16} className="absolute left-3.5 text-slate-400" />
             <input type="text" placeholder="Search by name or mobile..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-800 transition-colors" />
@@ -198,9 +196,10 @@ const PatientSummary = () => {
           <p className="text-sm font-semibold text-slate-500">No matching search entries found</p>
         </div>
       ) : (
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+        /* FIXED: w-full overflow-x-auto allows clean horizontal swipe scrollbar tracking on phones */
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden w-full">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[750px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
                   <th className="px-6 py-4 w-16 text-center">S.No</th>
@@ -217,11 +216,10 @@ const PatientSummary = () => {
                     <td className="px-6 py-3.5 text-slate-400 text-center font-semibold">{index + 1}</td>
                     <td className="px-6 py-3.5 text-slate-400 whitespace-nowrap">{patient.dateAdmission}</td>
                     <td className="px-6 py-3.5 font-bold text-slate-800">{patient.name}</td>
-                    <td className="px-6 py-3.5 text-slate-600">{patient.age} Yrs / {patient.gender}</td>
+                    <td className="px-6 py-3.5 text-slate-600 whitespace-nowrap">{patient.age} Yrs / {patient.gender}</td>
                     <td className="px-6 py-3.5 text-slate-500 whitespace-nowrap">
                       {patient.residentCategory === 'Others' ? patient.otherCategory : patient.residentCategory}
                     </td>
-                    {/* FIXED: Removed the empty broken <td> entirely to realign columns perfectly */}
                     <td className="px-6 py-3.5 whitespace-nowrap text-center space-x-2">
                       <button onClick={() => handleOpenDetailDrawer(patient)} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors">
                         <Eye size={12} />
@@ -258,3 +256,4 @@ const PatientSummary = () => {
 };
 
 export default PatientSummary;
+

@@ -39,31 +39,24 @@ const AdminSummary = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  // Fetch today's slot configuration directly from DB
-const fetchDailySlots = async () => {
-  try {
-    const token = localStorage.getItem('manitham_token'); 
+  const fetchDailySlots = async () => {
+    try {
+      const token = localStorage.getItem('manitham_token'); 
 
-    const response = await fetch(`${API_BASE_URL}/slots/${todayKey}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`, // Pass header token string
-        'Content-Type': 'application/json'
-      }
-    });
-    const data = await response.json();
-    if (data.success) setSlots(data.slots);
-  } catch (error) {
-    console.error(error);
-  }
-};
+      const response = await fetch(`${API_BASE_URL}/slots/${todayKey}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (data.success) setSlots(data.slots);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-
-
-// Apply this exact headers dictionary pattern to your fetchSponsors function as well!
-
-
-  // Fetch global sponsors list to calculate reminder alerts
   const fetchSponsors = async () => {
     try {
       const token = localStorage.getItem('manitham_token');
@@ -83,7 +76,6 @@ const fetchDailySlots = async () => {
       console.error("Error fetching sponsors:", error);
     }
   };
-
 
   useEffect(() => {
     fetchDailySlots();
@@ -141,17 +133,19 @@ const fetchDailySlots = async () => {
     setIsDrawerOpen(false);
   };
 
-    return (
-    <div className="p-2 relative space-y-8">
+  return (
+    <div className="p-2 relative space-y-8 w-full overflow-hidden">
       
       {/* Header Layout */}
-      <div className="flex items-center gap-2.5 border-b border-slate-200/60 pb-4 text-slate-900">
-        <Calendar size={22} className="stroke-[2.5]" /> 
-        <h2 className="text-xl font-black tracking-wider uppercase">Appointments - {todayDateString}</h2>
+      <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200/60 pb-4 text-slate-900">
+        <Calendar size={22} className="stroke-[2.5] shrink-0" /> 
+        <h2 className="text-lg lg:text-xl font-black tracking-wider uppercase break-words max-w-full">
+          Appointments - {todayDateString}
+        </h2>
       </div>
 
-      {/* Grid Container for Appointment Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Grid Container for Appointment Cards: 1 column on phones, 3 columns on large desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {slots.map((slot) => (
           <BookingCard 
             key={slot.id} 
@@ -163,15 +157,18 @@ const fetchDailySlots = async () => {
 
       {/* Sponsorship Renewal Alerts Table Section */}
       {reminders.length > 0 && (
-        <div className="space-y-4 pt-4">
+        <div className="space-y-4 pt-4 w-full">
           <div className="flex items-center gap-2.5 text-slate-900">
-            <Bell size={20} className="stroke-[2.5]" />
-            <h3 className="text-base font-black tracking-wider uppercase">Sponsorship Renewal Alerts (10 Days Left)</h3>
+            <Bell size={20} className="stroke-[2.5] shrink-0" />
+            <h3 className="text-sm lg:text-base font-black tracking-wider uppercase">
+              Sponsorship Renewal Alerts (10 Days Left)
+            </h3>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+          {/* FIXED: w-full overflow-x-auto allows clean horizontal swipe scrollbar tracking on phones */}
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl shadow-xs overflow-hidden w-full">
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                   <tr className="bg-slate-900 text-xs font-bold text-slate-200 uppercase tracking-wider">
                     <th className="px-6 py-4 w-20 text-center">Called</th>
@@ -213,7 +210,6 @@ const fetchDailySlots = async () => {
         </div>
       )}
 
-      {/* Global Sliding Sidebar Form Panel Overlay Module */}
       {selectedSlot && (
         <AppointmentDrawer 
           isOpen={isDrawerOpen} 

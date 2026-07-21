@@ -9,7 +9,8 @@ const Dashboard = () => {
   return (
     <div className='flex min-h-screen bg-slate-50'>
       <AdminSidebar />
-      <div className='flex-1 ml-[260px] p-8'>
+      
+      <div className='flex-1 ml-0 lg:ml-[260px] p-4 lg:p-8 pt-20 lg:pt-8 w-full overflow-hidden'>
         <AdminSummary />
       </div>
     </div>
