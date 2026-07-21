@@ -59,7 +59,8 @@ const Sidebar = () => {
         - Uses 'h-screen flex flex-col justify-between overflow-hidden' 
         - This forces the wrapper container to stay exactly inside the screen bounds
       */}
-      <div className={`bg-slate-900 text-white h-screen fixed top-0 bottom-0 left-0 w-[260px] border-r border-white/5 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+      <div className={`bg-slate-900 text-white h-[100dvh] fixed top-0 bottom-0 left-0 w-[260px] border-r border-white/5 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
