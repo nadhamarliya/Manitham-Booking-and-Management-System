@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // FIXED: Imported useEffect hook
 import { NavLink , useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../context/authContext.jsx'; 
 import { 
@@ -20,6 +20,20 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
+
+  // FIXED: Locks the background website body scrolling when the menu slides open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    // Cleans up the background block if the user changes pages completely
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const handleLogout = () => {
     logout(); 
@@ -54,13 +68,8 @@ const Sidebar = () => {
         />
       )}
 
-      {/* 
-        FIXED CONTAINER: 
-        - Uses 'h-screen flex flex-col justify-between overflow-hidden' 
-        - This forces the wrapper container to stay exactly inside the screen bounds
-      */}
+      {/* RESPONSIVE MENU DRAWER CONTAINER */}
       <div className={`bg-slate-900 text-white h-[100dvh] fixed top-0 bottom-0 left-0 w-[260px] border-r border-white/5 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
@@ -73,7 +82,7 @@ const Sidebar = () => {
           </div>
 
           {/* FIXED: Dynamic padding adjustment clears the mobile header gap cleanly */}
-          <div className="px-4 mb-4 mt-20 lg:mt-4">
+          <div className="px-4 mb-4 mt-16 lg:mt-4">
             <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.05] rounded-xl">
               <div className="h-9 w-9 rounded-lg bg-white/10 flex items-center justify-center text-sm font-semibold text-slate-300 uppercase shrink-0">
                 {userName.charAt(0)}
@@ -122,11 +131,7 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* 
-          FIXED LOWER PANEL:
-          - Sits entirely outside the scrolling box container elements
-          - Always remains locked right above the bottom touch surface of your phone!
-        */}
+        {/* FIXED LOWER LOGOUT PANEL */}
         <div className="p-4 border-t border-white/5 bg-slate-900 shrink-0">
           <button 
             onClick={handleLogout}
